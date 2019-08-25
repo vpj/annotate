@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="/annotate.png?raw=true" width="100%" title="Logo">
+</p>
+
 ## What is it?
 
 It is a simple web app that lets you write Markdown side notes around your code,
