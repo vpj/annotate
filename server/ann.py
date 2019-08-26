@@ -7,7 +7,7 @@ from typing import Optional, Awaitable
 import tornado.ioloop
 import tornado.web
 
-UI_PATH = Path(__file__).parent.parent / 'ui'
+UI_PATH = Path(os.path.abspath(__file__)).parent.parent / 'ui'
 print(UI_PATH)
 
 CWD = Path(os.getcwd())
