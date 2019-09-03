@@ -8,10 +8,10 @@ import tornado.ioloop
 import tornado.web
 
 UI_PATH = Path(os.path.abspath(__file__)).parent.parent / 'ui'
-print(UI_PATH)
 
 CWD = Path(os.getcwd())
-print(CWD)
+
+extensions = []
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -19,20 +19,23 @@ class MainHandler(tornado.web.RequestHandler):
         pass
 
     def get(self):
-        self.write("Hello, world")
+        with open(str(UI_PATH / 'index.html'), 'r') as f:
+            self.write(f.read())
 
 
-def python_files(path: Path):
+def source_files(path: Path):
     assert path.is_dir()
 
     files = []
 
     for p in path.iterdir():
         if p.is_dir():
-            files += python_files(p)
+            files += source_files(p)
         else:
-            if p.suffix == '.py':
-                files.append(p)
+            for e in extensions:
+                if p.suffix == f'.{e}':
+                    files.append(p)
+                    break
 
     return files
 
@@ -46,7 +49,7 @@ def read_file(path: Path):
 
 
 def get_source():
-    files = python_files(CWD)
+    files = source_files(CWD)
 
     source = {str(p.relative_to(CWD)): read_file(p) for p in files}
 
@@ -100,6 +103,23 @@ def make_app():
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Run annotate server.')
+    parser.add_argument('--extensions', metavar='e', type=str, nargs='+',
+                        default=['py'],
+                        help='list of extensions')
+    parser.add_argument('--port', default=8888, type=int,
+                        help='Port')
+
+    args = parser.parse_args()
+
+    print(f"Project folder: {CWD}")
+    # print(f"Static files: {UI_PATH}")
+    print(f"Starting server at http://localhost:{args.port}/")
+    extensions = args.extensions
+    print(f"Opening files with extensions: {extensions}")
+
     app = make_app()
-    app.listen(8888)
+    app.listen(args.port)
     tornado.ioloop.IOLoop.current().start()
