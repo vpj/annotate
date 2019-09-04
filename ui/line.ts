@@ -29,8 +29,9 @@ class LineElem {
     comments: number;
     collapsedHeader: number;
     collapsed: number;
+    language: string;
 
-    constructor(line: Line, clickListener: LineClickListener, addListener: LineClickListener) {
+    constructor(line: Line, language: string, clickListener: LineClickListener, addListener: LineClickListener) {
         this.comments = 0;
         this.collapsed = 0;
         this.collapsedHeader = 0;
@@ -40,6 +41,7 @@ class LineElem {
         this.elem.className = "line";
         this.clickListener = clickListener;
         this.addListener = addListener;
+        this.language = language;
     }
 
     render() {
@@ -63,7 +65,7 @@ class LineElem {
         this.elem.appendChild(this.lineNoElem);
     
         if(this.line.code.trim() !== "") {
-            let h = highlight("python", this.line.code, true, null);
+            let h = highlight(this.language, this.line.code, true, null);
             this.codeElem.innerHTML = h.value;
             this.elem.appendChild(this.codeElem);
         }
@@ -159,17 +161,17 @@ class Lines {
         this.noteAddListener = noteAddListener;
     }
 
-    load(lines: string[]) {
+    load(lines: string[], language: string) {
         this.lines = [];
         this.container.innerHTML = '';
         for(let l of lines) {
-            this.add(l);
+            this.add(l, language);
         }
     }
 
-    add(code: string) {
+    add(code: string, language: string) {
         let line = new Line(this.lines.length, code);
-        let elem = new LineElem(line, this.lineClickListener, this.noteAddListener);
+        let elem = new LineElem(line, language, this.lineClickListener, this.noteAddListener);
         this.lines.push(elem);
         elem.render();
         this.container.appendChild(elem.elem);

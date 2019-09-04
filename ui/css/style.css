@@ -336,3 +336,40 @@ div.note > div.view {
   overflow: hidden;
 }
 
+#files {
+  line-height: 24px;
+  font-family: Monaco, Consolas, "Lucida Console", monospace;
+  font-size: 12px;
+}
+
+#files div.folder {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+#files > div.folder {
+  margin-left: -10px;
+}
+
+#files div.folder > div.label > span {
+  color: #999;
+}
+
+#files div.label > i {
+  margin-right: 5px;
+}
+
+#files div.file {
+  color: #aaa;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.project_panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  overflow: scroll;
+}

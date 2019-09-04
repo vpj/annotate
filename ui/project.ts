@@ -30,10 +30,30 @@ class Project {
             this.onFileClick.bind(this));      
     }
 
+    language(path: string) {
+        let parts = path.split('.');
+        let extension = parts[parts.length - 1];
+
+        switch(extension) {
+            case 'py':
+                return 'python';
+            case 'php':
+                return 'php';
+            case 'js':
+                return 'javascript';
+            case 'ts':
+                return 'typescript';
+            case 'md':
+                    return 'markdown';
+            default:
+                return 'text';
+        }
+    }
+
     open(path: string) {
         this.selected_file = path;
         this.source.load(this.all_code[path]);
-        this.lines.load(this.source.lines);
+        this.lines.load(this.source.lines, this.language(path));
         this.notes.load(this.all_notes[path]);
     }
 
@@ -54,6 +74,13 @@ class Project {
                 for(let f in files) {
                     this.open(f);
                     break;
+                }
+
+                for(let f in files) {
+                    if(this.all_notes[f].length > 0) {
+                        console.log(f);
+                    }
+                    this.files.updateNotes(f, this.all_notes[f].length != 0)
                 }
             })
         })        
@@ -77,6 +104,7 @@ class Project {
     }
 
     private saveNotes() {
+        this.files.updateNotes(this.selected_file, this.all_notes[this.selected_file].length != 0);
         api.setNotes(JSON.stringify(this.all_notes), () => {
             window.status = "Saved";
         })
