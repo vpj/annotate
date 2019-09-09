@@ -94,8 +94,8 @@ class Project {
         this.notes.moveToLine(lineNo);
     }
 
-    private onNoteAdd(lineNo: number) {
-        this.notes.newNote(lineNo, lineNo);
+    private onNoteAdd(start: number, end: number) {
+        this.notes.newNote(start, end);
     }
 
     private onNotesChanged() {

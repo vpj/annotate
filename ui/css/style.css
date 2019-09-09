@@ -135,6 +135,8 @@ code {
   width: 30px;
   text-align: right;
   color: #666;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .column {
@@ -228,6 +230,11 @@ code {
 
 .line.selected {
   background: rgba(0, 0, 0, 0.6);
+  display: block;
+}
+
+.line.user_selected {
+  background: #555;
   display: block;
 }
 

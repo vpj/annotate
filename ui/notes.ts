@@ -169,7 +169,7 @@ class Notes {
     }
 
     newNote(start: number, end: number) {
-        let noteElem = this.create('New Note', start, end, {});
+        let noteElem = this.create('', start, end, {});
         this.select(noteElem.key);
         noteElem.edit();
     }
@@ -229,6 +229,9 @@ class Notes {
                 this.lines.unselect(i);
             }
             this.selected = null;
+            if(oldNote.note.note.trim() == '') {
+                this.remove(oldNote);
+            }
         }
     }
 

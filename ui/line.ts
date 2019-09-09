@@ -5,6 +5,10 @@ interface LineClickListener {
     (lineNo: number): void
 }
 
+interface NoteAddListener {
+    (start: number, end: number): void
+}
+
 
 class Line {
     lineNo: number
@@ -25,13 +29,16 @@ class LineElem {
     hasComments: HTMLElement;
     hasCommentsMany: HTMLElement;
     clickListener: LineClickListener;
-    addListener: LineClickListener;
+    addListener: NoteAddListener;
+
     comments: number;
     collapsedHeader: number;
     collapsed: number;
     language: string;
 
-    constructor(line: Line, language: string, clickListener: LineClickListener, addListener: LineClickListener) {
+    userSelected: boolean;
+
+    constructor(line: Line, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
         this.comments = 0;
         this.collapsed = 0;
         this.collapsedHeader = 0;
@@ -42,6 +49,8 @@ class LineElem {
         this.clickListener = clickListener;
         this.addListener = addListener;
         this.language = language;
+
+        this.userSelected = false;
     }
 
     render() {
@@ -77,7 +86,7 @@ class LineElem {
 
     private onAddCommentClick() {
         if(this.addListener != null) {
-            this.addListener(this.line.lineNo);
+            this.addListener(this.line.lineNo, this.line.lineNo);
         }
     }
 
@@ -145,20 +154,121 @@ class LineElem {
     getY() {
         return this.elem.offsetTop;
     }
+
+    userSelect(selected: boolean) {
+        if(selected == this.userSelected)
+            return;
+
+        this.userSelected = selected;
+        if(selected) {
+            this.elem.classList.add('user_selected');
+        } else {
+            this.elem.classList.remove('user_selected');
+        }
+    }
 }
 
 class Lines {
     lines: LineElem[]
     container: HTMLElement;
     lineClickListener: LineClickListener;
-    noteAddListener: LineClickListener;
+    noteAddListener: NoteAddListener;
+    userSelection?: any
 
     constructor(container: HTMLElement, lineClickListener: LineClickListener,
-        noteAddListener: LineClickListener) {
+        noteAddListener: NoteAddListener) {
         this.lines = [];
         this.container = container;
         this.lineClickListener = lineClickListener;
         this.noteAddListener = noteAddListener;
+        this.container.addEventListener('mousedown', (ev) => {
+            console.log('down', ev.pageX, ev.pageY, ev);
+            this.onUserSelect(ev.pageX, ev.pageY, 'start');
+        });
+        this.container.addEventListener('mousemove', (ev) => {
+            // console.log('move', ev.pageX, ev.pageY, ev);
+            this.onUserSelect(ev.pageX, ev.pageY, 'move');
+        });
+        this.container.addEventListener('mouseup', (ev) => {
+            console.log('up', ev.pageX, ev.pageY, ev);
+            this.onUserSelect(ev.pageX, ev.pageY, 'end');
+        });
+        this.container.addEventListener('mouseleave', (ev) => {
+            console.log('leave', ev.pageX, ev.pageY, ev);
+            this.onUserSelect(ev.pageX, ev.pageY, 'leave');
+        });
+    }
+
+    onUserSelect(x: number, y: number, event: string) {
+        if(this.lines.length == 0) 
+            return;
+
+        x -= this.container.getBoundingClientRect().left;
+        y -= this.container.getBoundingClientRect().top;
+
+        let line = this.lines[0];
+
+        console.log(x, y);
+
+        let height = line.elem.getBoundingClientRect().height;
+        let margin = line.codeElem.getBoundingClientRect().left -
+                     this.container.getBoundingClientRect().left;
+
+        console.log(height, margin);
+
+        let lineNo = Math.floor(y / height);
+
+        if(event == 'start') {
+            if(x >= margin) {
+                this.clearUserSelection();
+                return;
+            }
+
+            this.userSelection = {
+                start: lineNo,
+                end: lineNo
+            };
+
+            this.markUserSelection();
+        } else if(event == 'move') {
+            if(this.userSelection == null)
+                return;
+            this.userSelection.end = lineNo;
+            this.markUserSelection();
+        } else if(event == 'leave') {
+            if(this.userSelection == null)
+                return;
+            this.clearUserSelection();
+        } else {
+            if(this.userSelection == null)
+                return;
+            let f = Math.min(this.userSelection.start, this.userSelection.end);
+            let t = Math.max(this.userSelection.start, this.userSelection.end);
+            if(f != t) {
+                this.noteAddListener(f, t)
+            }
+            this.clearUserSelection();
+        }
+    }
+
+    markUserSelection() {
+        for(let l of this.lines) {
+            l.userSelect(false);
+        }
+
+        if(this.userSelection == null)
+            return;
+
+        let f = Math.min(this.userSelection.start, this.userSelection.end);
+        let t = Math.max(this.userSelection.start, this.userSelection.end);
+        for(let i = f; i <= t; ++i) {
+            this.lines[i].userSelect(true);
+        }
+    }
+
+    clearUserSelection() {
+        this.userSelection = null;
+        this.markUserSelection();
     }
 
     load(lines: string[], language: string) {

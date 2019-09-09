@@ -62,6 +62,10 @@ class NoteEditElem {
         }
     }
 
+    focusEdit() {
+        this.textArea.focus();
+    }
+
     setContent(text: string, match: NoteMatch) {
         this.textArea.value = text;
         this.start.value = `${match.start + 1}`;
@@ -207,6 +211,7 @@ class NoteElem {
     edit() {
         this.elem.classList.add('editing');
         this.editElem.setContent(this.note.note, this.match);
+        this.editElem.focusEdit();
     }
 
     private onSave() {
