@@ -17,4 +17,24 @@ function createIcon(name: string): HTMLElement {
     return icon;
 }
 
-export {createIcon};
+function getLanguage(path: string) {
+    let parts = path.split('.');
+    let extension = parts[parts.length - 1];
+
+    switch(extension) {
+        case 'py':
+            return 'python';
+        case 'php':
+            return 'php';
+        case 'js':
+            return 'javascript';
+        case 'ts':
+            return 'typescript';
+        case 'md':
+                return 'markdown';
+        default:
+            return 'text';
+    }
+}
+
+export {createIcon, getLanguage};

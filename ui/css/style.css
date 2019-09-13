@@ -168,6 +168,7 @@ code {
 .code_panel {
   width: 50%;
   position: relative;
+  overflow-x: scroll;
 }
 
 

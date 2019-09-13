@@ -13,10 +13,12 @@ interface NoteAddListener {
 class Line {
     lineNo: number
     code: string
+    language: string
 
-    constructor(lineNo: number, code: string) {
+    constructor(lineNo: number, code: string, language: string) {
         this.lineNo = lineNo;
         this.code = code;
+        this.language = language;
     }
 }
 
@@ -34,11 +36,10 @@ class LineElem {
     comments: number;
     collapsedHeader: number;
     collapsed: number;
-    language: string;
 
     userSelected: boolean;
 
-    constructor(line: Line, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
+    constructor(line: Line, clickListener: LineClickListener, addListener: NoteAddListener) {
         this.comments = 0;
         this.collapsed = 0;
         this.collapsedHeader = 0;
@@ -48,7 +49,6 @@ class LineElem {
         this.elem.className = "line";
         this.clickListener = clickListener;
         this.addListener = addListener;
-        this.language = language;
 
         this.userSelected = false;
     }
@@ -74,7 +74,7 @@ class LineElem {
         this.elem.appendChild(this.lineNoElem);
     
         if(this.line.code.trim() !== "") {
-            let h = highlight(this.language, this.line.code, true, null);
+            let h = highlight(this.line.language, this.line.code, true, null);
             this.codeElem.innerHTML = h.value;
             this.elem.appendChild(this.codeElem);
         }
@@ -96,7 +96,7 @@ class LineElem {
         }
     }
 
-    hasComment() {
+    addComment() {
         if(this.comments === 0) {
             this.elem.classList.add("commented");
         } else {
@@ -105,7 +105,7 @@ class LineElem {
         this.comments++;
     }
 
-    noComment() {
+    removeComment() {
         if(this.comments === 1) {
             this.elem.classList.remove("commented");
         } else {
@@ -114,26 +114,28 @@ class LineElem {
         this.comments--;
     }
 
-    isCollapsedHeader() {
-        this.elem.classList.add('collapsed_header')
-        this.collapsedHeader++;
-    }
+    setCollapsedHeader(isHeader: boolean) {
+        if(isHeader)
+            this.collapsedHeader++;
+        else 
+            this.collapsedHeader--;
 
-    noCollapsedHeader() {
-        if(this.collapsedHeader == 1)
+        if(this.collapsedHeader === 0)
             this.elem.classList.remove('collapsed_header')
-        this.collapsedHeader--;
+        else
+            this.elem.classList.add('collapsed_header')
     }
 
-    isCollapsed() {
-        this.elem.classList.add('collapsed')
-        this.collapsed++;
-    }
+    setCollapsed(isCollapsed: boolean) {
+        if(isCollapsed)
+            this.collapsed++;
+        else 
+            this.collapsed--;
 
-    noCollapsed() {
-        if(this.collapsed == 1)
+        if(this.collapsed === 0)
             this.elem.classList.remove('collapsed')
-        this.collapsed--;
+        else
+            this.elem.classList.add('collapsed')
     }
 
     clear() {
@@ -280,8 +282,8 @@ class Lines {
     }
 
     add(code: string, language: string) {
-        let line = new Line(this.lines.length, code);
-        let elem = new LineElem(line, language, this.lineClickListener, this.noteAddListener);
+        let line = new Line(this.lines.length, code, language);
+        let elem = new LineElem(line, this.lineClickListener, this.noteAddListener);
         this.lines.push(elem);
         elem.render();
         this.container.appendChild(elem.elem);

@@ -1,5 +1,6 @@
 
 class Note {
+    path: string;
     pre: string[];
     post: string[];
     code: string[];
@@ -18,7 +19,8 @@ class Note {
     //         this.note = note;
     // }
 
-    constructor(opt) {
+    constructor(path, opt: {[key: string]: any}) {
+        this.path = path;
         this.pre = opt['pre'];
         this.post = opt['post'];
         this.code = opt['code'];
@@ -38,7 +40,8 @@ class Note {
         }
     }
 
-    static create(pre: string[],
+    static create(path: string,
+        pre: string[],
         post: string[],
         code: string[],
         note: string,
@@ -55,7 +58,7 @@ class Note {
                 }
             }
 
-            return new Note(n);
+            return new Note(path, n);
     }
 }
 

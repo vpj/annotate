@@ -1,17 +1,19 @@
 import {api} from "./api";
-import {SourceCode} from "./source_code";
+import {SourceView} from "./source_view";
+import {SourceCodeMatcher} from "./source_code";
 import {Notes} from "./notes"
 import {Note} from "./note"
 import {Lines} from "./line"
 import {Files} from "./files"
+import { getLanguage } from "./util";
 
 declare namespace hljs {
     function highlight(name, value, ignore_illegals, continuation);
 }
 
 class Project {
-    source: SourceCode
-    lines: Lines
+    sourceView: SourceView
+    sourceMatcher: SourceCodeMatcher
     notes: Notes
     files: Files
     all_code: {[path: string]: string[]}
@@ -19,42 +21,21 @@ class Project {
     selected_file: string
 
     constructor() {
-        this.source = new SourceCode([]);
-        this.lines = new Lines(document.getElementById('source_code'),
+        this.sourceMatcher = new SourceCodeMatcher();
+        this.sourceView = new SourceView(document.getElementById('source_code'),
             this.onCodeClick.bind(this),
             this.onNoteAdd.bind(this));
         this.notes = new Notes(document.getElementById("notes"), 
-            this.source, this.lines,
+            this.sourceMatcher, this.sourceView,
             this.onNotesChanged.bind(this));     
         this.files = new Files(document.getElementById("files"),
             this.onFileClick.bind(this));      
     }
 
-    language(path: string) {
-        let parts = path.split('.');
-        let extension = parts[parts.length - 1];
-
-        switch(extension) {
-            case 'py':
-                return 'python';
-            case 'php':
-                return 'php';
-            case 'js':
-                return 'javascript';
-            case 'ts':
-                return 'typescript';
-            case 'md':
-                    return 'markdown';
-            default:
-                return 'text';
-        }
-    }
-
-    open(path: string) {
+    selectFile(path: string) {
         this.selected_file = path;
-        this.source.load(this.all_code[path]);
-        this.lines.load(this.source.lines, this.language(path));
-        this.notes.load(this.all_notes[path]);
+        this.sourceView.selectFile(path);
+        this.notes.selectFile(path);
     }
 
     load() {
@@ -70,9 +51,12 @@ class Project {
                     }
                 }        
                 this.files.load(files_list);
+                this.sourceMatcher.load(this.all_code);
+                this.sourceView.load(this.all_code);
+                this.notes.load(this.all_notes);
 
                 for(let f in files) {
-                    this.open(f);
+                    this.selectFile(f);
                     break;
                 }
 
@@ -87,7 +71,7 @@ class Project {
     }
     
     private onFileClick(file: string) {
-        this.open(file);
+        this.selectFile(file);
     }
 
     private onCodeClick(lineNo: number) {
