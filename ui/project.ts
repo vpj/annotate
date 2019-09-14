@@ -3,9 +3,7 @@ import {SourceView} from "./source_view";
 import {SourceCodeMatcher} from "./source_code";
 import {Notes} from "./notes"
 import {Note} from "./note"
-import {Lines} from "./line"
 import {Files} from "./files"
-import { getLanguage } from "./util";
 
 declare namespace hljs {
     function highlight(name, value, ignore_illegals, continuation);
@@ -25,9 +23,7 @@ class Project {
         this.sourceView = new SourceView(document.getElementById('source_code'),
             this.onCodeClick.bind(this),
             this.onNoteAdd.bind(this));
-        this.notes = new Notes(document.getElementById("notes"), 
-            this.sourceMatcher, this.sourceView,
-            this.onNotesChanged.bind(this));     
+        this.notes = new Notes(document.getElementById("notes"), this);
         this.files = new Files(document.getElementById("files"),
             this.onFileClick.bind(this));      
     }
@@ -74,12 +70,12 @@ class Project {
         this.selectFile(file);
     }
 
-    private onCodeClick(lineNo: number) {
-        this.notes.moveToLine(lineNo);
+    private onCodeClick(path: string, lineNo: number) {
+        this.notes.moveToLine(path, lineNo);
     }
 
-    private onNoteAdd(start: number, end: number) {
-        this.notes.newNote(start, end);
+    private onNoteAdd(path: string, start: number, end: number) {
+        this.notes.newNote(path, start, end);
     }
 
     private onNotesChanged() {

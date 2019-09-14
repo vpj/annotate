@@ -2,32 +2,24 @@ import {highlight} from "./hljs"
 import {createIcon} from "./util";
 
 interface LineClickListener {
-    (lineNo: number): void
+    (path: string, lineNo: number): void
 }
 
 interface NoteAddListener {
-    (start: number, end: number): void
+    (path: string, start: number, end: number): void
 }
 
-
-class Line {
-    lineNo: number
-    code: string
-    language: string
-
-    constructor(lineNo: number, code: string, language: string) {
-        this.lineNo = lineNo;
-        this.code = code;
-        this.language = language;
-    }
-}
 
 class LineElem {
-    line: Line;
-    elem: HTMLDivElement;
+    path: string;
+    lineNo: number;
+    code: string;
+    language: string;
+
+    elem?: HTMLDivElement;
     lineNoElem: HTMLSpanElement;
     codeElem: HTMLSpanElement;
-    addComment: HTMLElement;
+    addCommentIcon: HTMLElement;
     hasComments: HTMLElement;
     hasCommentsMany: HTMLElement;
     clickListener: LineClickListener;
@@ -38,26 +30,35 @@ class LineElem {
     collapsed: number;
 
     userSelected: boolean;
+    rank: number
 
-    constructor(line: Line, clickListener: LineClickListener, addListener: NoteAddListener) {
+    constructor(path: string, lineNo: number, code: string, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
+        this.path = path;
+        this.lineNo = lineNo;
+        this.code = code;
+        this.language = language;
+
         this.comments = 0;
         this.collapsed = 0;
         this.collapsedHeader = 0;
         
-        this.line = line;
-        this.elem = document.createElement('div');
-        this.elem.className = "line";
         this.clickListener = clickListener;
         this.addListener = addListener;
 
         this.userSelected = false;
+        this.elem = null;
+        this.rank = 0;
     }
 
-    render() {
-        this.addComment = createIcon('plus');
-        this.addComment.classList.add('add_comment');
-        this.elem.appendChild(this.addComment);
-        this.addComment.addEventListener('click', this.onAddCommentClick.bind(this));
+    render(rank: number) {
+        this.rank = rank;
+        this.elem = document.createElement('div');
+        this.elem.className = "line";
+
+        this.addCommentIcon = createIcon('plus');
+        this.addCommentIcon.classList.add('add_comment');
+        this.elem.appendChild(this.addCommentIcon);
+        this.addCommentIcon.addEventListener('click', this.onAddCommentClick.bind(this));
 
         this.hasComments = createIcon('comment');
         this.hasComments.classList.add('has_comments');
@@ -70,11 +71,11 @@ class LineElem {
         this.codeElem = document.createElement("span");
     
         this.lineNoElem.className = "line_no";
-        this.lineNoElem.textContent = `${this.line.lineNo + 1}`;
+        this.lineNoElem.textContent = `${this.lineNo + 1}`;
         this.elem.appendChild(this.lineNoElem);
     
-        if(this.line.code.trim() !== "") {
-            let h = highlight(this.line.language, this.line.code, true, null);
+        if(this.code.trim() !== "") {
+            let h = highlight(this.language, this.code, true, null);
             this.codeElem.innerHTML = h.value;
             this.elem.appendChild(this.codeElem);
         }
@@ -82,36 +83,56 @@ class LineElem {
         this.codeElem.addEventListener('click', this.onLineClick.bind(this));
         this.hasComments.addEventListener('click', this.onLineClick.bind(this));
         this.hasCommentsMany.addEventListener('click', this.onLineClick.bind(this));
+
+        this.setCommentsCss();
+        this.setCollapsedCss();
+        this.setCollapsedHeaderCss();
+    }
+
+    isRendered() {
+        return this.elem !== null;
+    }
+
+    remove() {
+        this.elem.parentElement.removeChild(this.elem);
+        this.elem = null;
     }
 
     private onAddCommentClick() {
-        if(this.addListener != null) {
-            this.addListener(this.line.lineNo, this.line.lineNo);
-        }
+        this.addListener(this.path, this.lineNo, this.lineNo);
     }
 
     private onLineClick() {
-        if(this.clickListener != null) {
-            this.clickListener(this.line.lineNo);
+        this.clickListener(this.path, this.lineNo);
+    }
+
+    private setCommentsCss() {
+        if(this.comments == 0) {
+            this.elem.classList.remove("commented");
+            this.elem.classList.remove("commented_many");
+        } else if(this.comments === 1) {
+            this.elem.classList.add("commented");
+            this.elem.classList.remove("commented_many");
+        } else {
+            this.elem.classList.add("commented_many");
         }
     }
 
     addComment() {
-        if(this.comments === 0) {
-            this.elem.classList.add("commented");
-        } else {
-            this.elem.classList.add("commented_many");
-        }
         this.comments++;
+        this.setCommentsCss();
     }
 
     removeComment() {
-        if(this.comments === 1) {
-            this.elem.classList.remove("commented");
-        } else {
-            this.elem.classList.remove("commented_many");
-        }
         this.comments--;
+        this.setCommentsCss();
+    }
+
+    private setCollapsedHeaderCss() {
+        if(this.collapsedHeader === 0)
+            this.elem.classList.remove('collapsed_header')
+        else
+            this.elem.classList.add('collapsed_header')
     }
 
     setCollapsedHeader(isHeader: boolean) {
@@ -120,10 +141,14 @@ class LineElem {
         else 
             this.collapsedHeader--;
 
-        if(this.collapsedHeader === 0)
-            this.elem.classList.remove('collapsed_header')
+        this.setCollapsedHeaderCss()
+    }
+
+    private setCollapsedCss() {
+        if(this.collapsed === 0)
+            this.elem.classList.remove('collapsed')
         else
-            this.elem.classList.add('collapsed_header')
+            this.elem.classList.add('collapsed')
     }
 
     setCollapsed(isCollapsed: boolean) {
@@ -132,10 +157,7 @@ class LineElem {
         else 
             this.collapsed--;
 
-        if(this.collapsed === 0)
-            this.elem.classList.remove('collapsed')
-        else
-            this.elem.classList.add('collapsed')
+        this.setCollapsedCss();
     }
 
     clear() {
@@ -145,12 +167,12 @@ class LineElem {
         this.elem.classList.remove("selected");
     }
 
-    select() {
-        this.elem.classList.add("selected");
-    }
-
-    unselect() {
-        this.elem.classList.remove("selected");
+    setSelected(isSelected: boolean) {
+        if(isSelected) {
+            this.elem.classList.add("selected");
+        } else {
+            this.elem.classList.remove("selected");
+        }
     }
 
     getY() {
@@ -170,184 +192,4 @@ class LineElem {
     }
 }
 
-class Lines {
-    lines: LineElem[]
-    container: HTMLElement;
-    lineClickListener: LineClickListener;
-    noteAddListener: NoteAddListener;
-    userSelection?: any
-
-    constructor(container: HTMLElement, lineClickListener: LineClickListener,
-        noteAddListener: NoteAddListener) {
-        this.lines = [];
-        this.container = container;
-        this.lineClickListener = lineClickListener;
-        this.noteAddListener = noteAddListener;
-        this.container.addEventListener('mousedown', (ev) => {
-            console.log('down', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.pageX, ev.pageY, 'start');
-        });
-        this.container.addEventListener('mousemove', (ev) => {
-            // console.log('move', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.pageX, ev.pageY, 'move');
-        });
-        this.container.addEventListener('mouseup', (ev) => {
-            console.log('up', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.pageX, ev.pageY, 'end');
-        });
-        this.container.addEventListener('mouseleave', (ev) => {
-            console.log('leave', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.pageX, ev.pageY, 'leave');
-        });
-    }
-
-    onUserSelect(x: number, y: number, event: string) {
-        if(this.lines.length == 0) 
-            return;
-
-        x -= this.container.getBoundingClientRect().left;
-        y -= this.container.getBoundingClientRect().top;
-
-        let line = this.lines[0];
-
-        console.log(x, y);
-
-        let height = line.elem.getBoundingClientRect().height;
-        let margin = line.codeElem.getBoundingClientRect().left -
-                     this.container.getBoundingClientRect().left;
-
-        console.log(height, margin);
-
-        let lineNo = Math.floor(y / height);
-
-        if(event == 'start') {
-            if(x >= margin) {
-                this.clearUserSelection();
-                return;
-            }
-
-            this.userSelection = {
-                start: lineNo,
-                end: lineNo
-            };
-
-            this.markUserSelection();
-        } else if(event == 'move') {
-            if(this.userSelection == null)
-                return;
-            this.userSelection.end = lineNo;
-            this.markUserSelection();
-        } else if(event == 'leave') {
-            if(this.userSelection == null)
-                return;
-            this.clearUserSelection();
-        } else {
-            if(this.userSelection == null)
-                return;
-            let f = Math.min(this.userSelection.start, this.userSelection.end);
-            let t = Math.max(this.userSelection.start, this.userSelection.end);
-            if(f != t) {
-                this.noteAddListener(f, t)
-            }
-            this.clearUserSelection();
-        }
-    }
-
-    markUserSelection() {
-        for(let l of this.lines) {
-            l.userSelect(false);
-        }
-
-        if(this.userSelection == null)
-            return;
-
-        let f = Math.min(this.userSelection.start, this.userSelection.end);
-        let t = Math.max(this.userSelection.start, this.userSelection.end);
-        for(let i = f; i <= t; ++i) {
-            this.lines[i].userSelect(true);
-        }
-    }
-
-    clearUserSelection() {
-        this.userSelection = null;
-        this.markUserSelection();
-    }
-
-    load(lines: string[], language: string) {
-        this.lines = [];
-        this.container.innerHTML = '';
-        for(let l of lines) {
-            this.add(l, language);
-        }
-    }
-
-    add(code: string, language: string) {
-        let line = new Line(this.lines.length, code, language);
-        let elem = new LineElem(line, this.lineClickListener, this.noteAddListener);
-        this.lines.push(elem);
-        elem.render();
-        this.container.appendChild(elem.elem);
-    }
-
-    hasComment(lineNo: number) {
-        this.lines[lineNo].hasComment();
-    }
-
-    noComment(lineNo: number) {
-        this.lines[lineNo].noComment();
-    }
-
-    isCollapsedHeader(lineNo: number) {
-        this.lines[lineNo].isCollapsedHeader()
-    }
-
-    noCollapsedHeader(lineNo: number) {
-        this.lines[lineNo].noCollapsedHeader()
-    }
-
-    isCollapsed(lineNo: number) {
-        this.lines[lineNo].isCollapsed()
-    }
-
-    noCollapsed(lineNo: number) {
-        this.lines[lineNo].noCollapsed()
-    }
-
-    clear() {
-        for(let i = 0; i < this.lines.length; ++i) {
-            this.lines[i].clear();
-        }
-    }
-
-    select(lineNo: number) {
-        this.lines[lineNo].select();
-    }
-
-    unselect(lineNo: number) {
-        this.lines[lineNo].unselect();
-    }
-
-    getY(lineNo: number) {
-        return this.lines[lineNo].getY();
-    }
-
-    scroll(lineNo: number, offset: number) {
-        let node = this.container;
-        let containerOffset = 0;
-        while(node != null) {
-            containerOffset += node.offsetTop;
-            node = node.parentElement;
-        }
-        window.scroll(0, this.lines[lineNo].getY() + containerOffset - Math.round(offset));
-    }
-
-    getCode(lineNo: number) {
-        if(lineNo < 0 || lineNo >= this.lines.length) {
-            return null;
-        }
-
-        return this.lines[lineNo].line.code;
-    }
-}
-
-export {Lines};
+export {LineElem, LineClickListener, NoteAddListener};

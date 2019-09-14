@@ -1,7 +1,5 @@
 import {Note} from "./note";
-import {SourceCodeMatcher } from "./source_code";
-import {Lines} from "./line";
-import {NoteElem, NoteClickListener, NotesChangedListener} from "./note_elem";
+import {NoteElem, NoteClickListener} from "./note_elem";
 import { Project } from "./project";
 
 const PADDING = 5;
@@ -14,8 +12,8 @@ class Notes {
     container: HTMLElement;
     notesCount: number;
     lineToNote: {[lineNo: number]: {[key: string]: boolean}};
-    selected?: string;
-    changedListener: NotesChangedListener;
+    selected?: NoteElem;
+    changedListener: NoteClickListener;
     selectedFile?: string;
     renderedNotes: NoteElem[];
 
@@ -27,115 +25,19 @@ class Notes {
         this.lineToNote = {};
         this.selected = null;
         this.selectedFile = null;
+        this.renderedNotes = [];
     }
 
-    private loadNote(path: string, note: {[key: string]: any}) {
-        return new Note(path, note)
-    }
-    
-    load(notes: {[path: string]: {[key: string]: any}[]}) {
-        this.notes = {};
-        this.notesCount = 0;
-        this.lineToNote = {};
-        this.selected = null;
-        this.container.innerHTML = '';
-
-        for(let path in notes) {
-            for(let n of notes[path]) {
-                let note = this.loadNote(path, n);
-                this.add(path, note);
-            }
-        }
-    }
-
-    private onNoteClick(path: string, noteKey: string) {
-        if(this.selected == noteKey) {
-            this.clearSelected();
-        } else {
-            let y = this.notes[path][noteKey].elem.getBoundingClientRect().top;
-            let lineNo = this.select(noteKey);
-            if(lineNo != null) {
-                this.project.sourceView.scroll(path, lineNo, y);
-            }
-        }
-    }
-
-    private onUpdate(noteElem: NoteElem, start: number, end: number, content: string) {
-        if(noteElem != null) {
-            if(this.selected === noteElem.key) {
-                this.clearSelected();
-            }
-            this.remove(noteElem);
-            if(content != null && content.trim() != '') {
-                let newNoteElem = this.create(content, start, end,
-                     noteElem.note.getJSON());
-                this.select(newNoteElem.key);
-            }
-        }
-
-        this.changedListener();
-    }
-
-    private onCollapseCode(path: string, key: string) {
-        let noteElem = this.notes[path][key];
-        let match = noteElem.match;
-        if(noteElem.note.codeCollapsed) {
-            this.project.sourceView.setCollapsedHeader(path, match.start, true);
-            for(let i = match.start + 1; i <= match.end; ++i) {
-                this.project.sourceView.setCollapsed(path, i, true);
-            }    
-        } else {
-            this.project.sourceView.setCollapsedHeader(path, match.start, false);
-            for(let i = match.start + 1; i <= match.end; ++i) {
-                this.project.sourceView.setCollapsed(path, i, false);
-            }    
-        }
-
-        this.changedListener();
-    }
-
-    remove(noteElem: NoteElem) {
-        let path = noteElem.note.path;
-        delete this.notes[path][noteElem.key];
-        noteElem.remove();
-        for(let i = 0; i < this.renderedNotes.length; ++i) {
-            if(this.renderedNotes[i] === noteElem) {
-                this.renderedNotes.remove(i);
-                break;
-            }
-        }
-
-        let match = noteElem.match;
-        if(match.start > match.end) {
-            return;
-        }
-        
-        for(let i = match.start; i <= match.start; ++i) {
-            delete this.lineToNote[i][noteElem.key];
-            this.project.sourceView.removeComment(path, i);
-        }
-
-        if(noteElem.note.codeCollapsed) {
-            this.project.sourceView.setCollapsedHeader(path, match.start, false);
-            for(let i = match.start + 1; i <= match.end; ++i) {
-                this.project.sourceView.setCollapsed(path, i, false);
-            }    
-        }
-    }
-
-    add(note: Note) {
-        let match = this.project.sourceMatcher.match(note);
-        let key = `${this.notesCount}`;
-        let elem = new NoteElem(key, note, match, 
-            this.onNoteClick.bind(this),
-            this.onUpdate.bind(this),
-            this.onCollapseCode.bind(this));
-
+    private renderNote(note: NoteElem) {
+        note.render();
         let nextNoteIdx = null;
-        let rank = this.project.sourceView.getRenderedLineRank(note.path, match.start);
+        const match = note.match;
+        const path = note.note.path;
+
+        let rank = this.project.sourceView.getRenderedLineRank(path, match.start);
         for(let i = 0; i < this.renderedNotes.length; ++i) {
             let n = this.renderedNotes[i];
-            let r = this.project.sourceView.getLineRank(n.path, n.match.start);
+            let r = this.project.sourceView.getRenderedLineRank(n.note.path, n.match.start);
 
             if(r > rank) {
                 nextNoteIdx = i;
@@ -143,16 +45,14 @@ class Notes {
             }
         }
 
-        this.notesCount++;
-        this.notes[note.path][key] = elem;
-        elem.update();
+        note.update();
 
         if(nextNoteIdx == null) {
-            this.container.appendChild(elem.elem);
-            this.renderedNotes.push(elem);
+            this.container.appendChild(note.elem);
+            this.renderedNotes.push(note);
         } else {
-            this.container.insertBefore(elem.elem, this.renderedNotes[nextNoteIdx]);
-            this.renderedNotes.insertBefore(nextNoteIdx, elem);
+            this.container.insertBefore(note.elem, this.renderedNotes[nextNoteIdx].elem);
+            this.renderedNotes.splice(nextNoteIdx, 0, note);
         }
 
         if(match.start > match.end) {
@@ -162,24 +62,80 @@ class Notes {
             if(!(i in this.lineToNote)) {
                 this.lineToNote[i] = {};
             }
-            this.lineToNote[i][key] = true;
-            this.project.sourceView.addComment(note, path, i);
+            this.lineToNote[i][note.key] = true;
+            this.project.sourceView.addComment(path, i);
         }
 
-        if(note.codeCollapsed) {
-            this.project.sourceView.setCollapsedHeader(note.path, match.start, true);
+        if(note.note.codeCollapsed) {
+            this.project.sourceView.setCollapsedHeader(path, match.start, true);
             for(let i = match.start + 1; i <= match.end; ++i) {
-                this.project.sourceView.setCollapsed(note.path, i, true);
+                this.project.sourceView.setCollapsed(path, i, true);
             }    
         }
+    }
+
+    private addNote(note: Note): NoteElem {
+        let match = this.project.sourceMatcher.match(note);
+        let key = `${this.notesCount}`;
+        let elem = new NoteElem(key, note, match, 
+            this.onNoteClick.bind(this),
+            this.onUpdate.bind(this),
+            this.onCollapseCode.bind(this));
+
+        this.notesCount++;
+        if(!(note.path in this.notes)) {
+            this.notes[note.path] = {};
+        }
+        this.notes[note.path][key] = elem;
 
         return elem;
     }
 
-    newNote(path: string, start: number, end: number) {
-        let noteElem = this.create(path, '', start, end, {});
-        this.select(noteElem.key);
-        noteElem.edit();
+    load(notes: {[path: string]: {[key: string]: any}[]}) {
+        this.notes = {};
+        this.notesCount = 0;
+        this.lineToNote = {};
+        this.selected = null;
+        this.container.innerHTML = '';
+
+        for(let path in notes) {
+            for(let n of notes[path]) {
+                let note = new Note(path, n);
+                this.addNote(note);
+            }
+        }
+    }
+
+    private removeAll() {
+        for(const n of this.renderedNotes) {
+            n.remove();
+        }
+
+        this.renderedNotes = [];
+        this.selected = null;
+    }
+
+    selectFile(path: string) {
+        this.selectedFile = path;
+        this.removeAll();
+        let notes = this.notes[path];
+
+        for(const k in notes) {
+            this.renderNote(notes[k]);
+        }
+    }
+
+    private onNoteClick(path: string, key: string) {
+        const note = this.notes[path][key];
+        if(this.selected === note) {
+            this.clearSelected();
+        } else {
+            let y = note.elem.getBoundingClientRect().top;
+            let lineNo = this.select(path, key);
+            if(lineNo != null) {
+                this.project.sourceView.scroll(path, lineNo, y);
+            }
+        }
     }
 
     private create(path: string, text: string, start: number, end: number, opt: {}) {
@@ -204,7 +160,78 @@ class Notes {
         }
 
         let note = Note.create(path, pre, post, code, text, opt);
-        return this.add(note);
+        let noteElem = this.addNote(note);
+        this.renderNote(noteElem);
+
+        return noteElem;
+    }
+
+    private onUpdate(note: NoteElem, isSaveOnly: boolean, start: number, end: number, content: string) {
+        if(!isSaveOnly) {
+            if(this.selected === note) {
+                this.clearSelected();
+            }
+            this.remove(note);
+            if(content != null && content.trim() != '') {
+                let newNote = this.create(note.note.path, content, start, end,
+                        note.note.getJSON());
+                this.select(newNote.note.path, newNote.key);
+            }
+        }
+
+        this.changedListener(note.note.path, note.key)
+    }
+
+    private onCollapseCode(note: NoteElem) {
+        let match = note.match;
+        if(note.note.codeCollapsed) {
+            this.project.sourceView.setCollapsedHeader(note.note.path, match.start, true);
+            for(let i = match.start + 1; i <= match.end; ++i) {
+                this.project.sourceView.setCollapsed(note.note.path, i, true);
+            }    
+        } else {
+            this.project.sourceView.setCollapsedHeader(note.note.path, match.start, false);
+            for(let i = match.start + 1; i <= match.end; ++i) {
+                this.project.sourceView.setCollapsed(note.note.path, i, false);
+            }    
+        }
+
+        this.changedListener(note.note.path, note.key);
+    }
+
+    remove(noteElem: NoteElem) {
+        let path = noteElem.note.path;
+        delete this.notes[path][noteElem.key];
+        noteElem.remove();
+        for(let i = 0; i < this.renderedNotes.length; ++i) {
+            if(this.renderedNotes[i] === noteElem) {
+                this.renderedNotes.splice(i, 1);
+                break;
+            }
+        }
+
+        let match = noteElem.match;
+        if(match.start > match.end) {
+            return;
+        }
+        
+        for(let i = match.start; i <= match.start; ++i) {
+            delete this.lineToNote[i][noteElem.key];
+            this.project.sourceView.removeComment(path, i);
+        }
+
+        if(noteElem.note.codeCollapsed) {
+            this.project.sourceView.setCollapsedHeader(path, match.start, false);
+            for(let i = match.start + 1; i <= match.end; ++i) {
+                this.project.sourceView.setCollapsed(path, i, false);
+            }    
+        }
+    }
+
+    newNote(path: string, start: number, end: number) {
+        let noteElem = this.create(path, '', start, end, {});
+        this.select(path, noteElem.key);
+        noteElem.edit();
     }
 
     moveToLine(path: string, lineNo: number) {
@@ -216,10 +243,10 @@ class Notes {
 
     clearSelected() {
         if(this.selected) {
-            let oldNote = this.notes[this.selected.path][this.selected.key];
+            let oldNote = this.notes[this.selected.note.path][this.selected.key];
             oldNote.unselect();
             for(let i = oldNote.match.start; i <= oldNote.match.end; ++i) {
-                this.project.sourceView.unselect(this.selected.path, i);
+                this.project.sourceView.setSelected(this.selected.note.path, i, false);
             }
             this.selected = null;
             if(oldNote.note.note.trim() == '') {
@@ -234,9 +261,9 @@ class Notes {
         let note = this.notes[path][key];
         note.select();
         for(let i = note.match.start; i <= note.match.end; ++i) {
-            this.project.sourceView.selectLine(path, i);
+            this.project.sourceView.setSelected(path, i, true);
         }
-        this.selected = key;
+        this.selected = note;
         let start = note.match.start;
         let isFirst = this.renderedNotes[0] === note;
 
@@ -245,7 +272,7 @@ class Notes {
         }
 
         window.requestAnimationFrame(() => {
-            let y = this.project.sourceView.getLineVerticalPosition(start);
+            let y = this.project.sourceView.getY(path, start);
             let yn = note.getY();
 
             let transform = y - yn;
