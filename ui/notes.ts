@@ -11,7 +11,7 @@ class Notes {
     project: Project;
     container: HTMLElement;
     notesCount: number;
-    lineToNote: {[lineNo: number]: {[key: string]: boolean}};
+    lineToNote: {[path: string]: {[lineNo: number]: {[key: string]: boolean}}};
     selected?: NoteElem;
     changedListener: NoteClickListener;
     selectedFile?: string;
@@ -55,14 +55,18 @@ class Notes {
             this.renderedNotes.splice(nextNoteIdx, 0, note);
         }
 
+        if(!(path in this.lineToNote)) {
+            this.lineToNote[path] = {};
+        }
+
         if(match.start > match.end) {
             return;
         }
         for(let i = match.start; i <= match.start; ++i) {
             if(!(i in this.lineToNote)) {
-                this.lineToNote[i] = {};
+                this.lineToNote[path][i] = {};
             }
-            this.lineToNote[i][note.key] = true;
+            this.lineToNote[path][i][note.key] = true;
             this.project.sourceView.addComment(path, i);
         }
 
@@ -139,23 +143,23 @@ class Notes {
     }
 
     private create(path: string, text: string, start: number, end: number, opt: {}) {
-        let pre = [];
-        let code = [];
-        let post = [];
+        let pre: string[] = [];
+        let code: string[] = [];
+        let post: string[] = [];
 
         for(let i = -PADDING; i < 0; ++i) {
             let line = this.project.sourceView.getCode(path, start + i);
             if(line != null) {
-                pre.push(line);
+                pre.push(line.code);
             }
         }
         for(let i = start; i <= end; ++i) {
-            code.push(this.project.sourceView.getCode(path, i));
+            code.push(this.project.sourceView.getCode(path, i).code);
         }
         for(let i = 1; i <= PADDING; ++i) {
             let line = this.project.sourceView.getCode(path, end + i);
             if(line != null) {
-                post.push(line);
+                post.push(line.code);
             }
         }
 
@@ -199,28 +203,32 @@ class Notes {
         this.changedListener(note.note.path, note.key);
     }
 
-    remove(noteElem: NoteElem) {
-        let path = noteElem.note.path;
-        delete this.notes[path][noteElem.key];
-        noteElem.remove();
+    remove(note: NoteElem) {
+        if(!note.isRendered()) {
+            return;
+        }
+
+        let path = note.note.path;
+        delete this.notes[path][note.key];
+        note.remove();
         for(let i = 0; i < this.renderedNotes.length; ++i) {
-            if(this.renderedNotes[i] === noteElem) {
+            if(this.renderedNotes[i] === note) {
                 this.renderedNotes.splice(i, 1);
                 break;
             }
         }
 
-        let match = noteElem.match;
+        let match = note.match;
         if(match.start > match.end) {
             return;
         }
         
         for(let i = match.start; i <= match.start; ++i) {
-            delete this.lineToNote[i][noteElem.key];
+            delete this.lineToNote[path][i][note.key];
             this.project.sourceView.removeComment(path, i);
         }
 
-        if(noteElem.note.codeCollapsed) {
+        if(note.note.codeCollapsed) {
             this.project.sourceView.setCollapsedHeader(path, match.start, false);
             for(let i = match.start + 1; i <= match.end; ++i) {
                 this.project.sourceView.setCollapsed(path, i, false);

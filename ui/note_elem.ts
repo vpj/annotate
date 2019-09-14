@@ -130,6 +130,8 @@ class NoteElem {
         this.clickListener = clickListener;
         this.updateListener = updateListener;
         this.collapseListener = collapseListener;
+
+        this.elem = null;
     }
 
     render() {
@@ -150,6 +152,10 @@ class NoteElem {
 
         this.view.addEventListener('click', this.onClick.bind(this));
         this.setCollapseCss();
+    }
+
+    isRendered(): boolean {
+        return this.elem !== null;
     }
 
     private onCodeCollapse() {
@@ -207,7 +213,7 @@ class NoteElem {
     }
 
     remove() {
-        this.elem.remove();
+        this.elem.parentElement.removeChild(this.elem);
         this.elem = null;
     }
 
