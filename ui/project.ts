@@ -14,8 +14,6 @@ class Project {
     sourceMatcher: SourceCodeMatcher
     notes: Notes
     files: Files
-    all_code: {[path: string]: string[]}
-    all_notes: {[path: string]: Note[]}
     selected_file: string
 
     constructor() {
@@ -36,20 +34,20 @@ class Project {
 
     load() {
         api.getSourceLines((files) => {
-            this.all_code = files;
+            let all_code = files;
             api.getNotes((notes) => {
-                this.all_notes = notes;
+                let all_notes = notes;
                 let files_list = [];
                 for(let f in files) {
                     files_list.push(f);
-                    if(!(f in this.all_notes)) {
-                        this.all_notes[f] = [];
+                    if(!(f in all_notes)) {
+                        all_notes[f] = [];
                     }
                 }        
                 this.files.load(files_list);
-                this.sourceMatcher.load(this.all_code);
-                this.sourceView.load(this.all_code);
-                this.notes.load(this.all_notes);
+                this.sourceMatcher.load(all_code);
+                this.sourceView.load(all_code);
+                this.notes.load(all_notes);
 
                 for(let f in files) {
                     this.selectFile(f);
@@ -57,10 +55,10 @@ class Project {
                 }
 
                 for(let f in files) {
-                    if(this.all_notes[f].length > 0) {
+                    if(all_notes[f].length > 0) {
                         console.log(f);
                     }
-                    this.files.updateNotes(f, this.all_notes[f].length != 0)
+                    this.files.updateNotes(f, all_notes[f].length != 0)
                 }
             })
         })        
@@ -78,14 +76,9 @@ class Project {
         this.notes.newNote(path, start, end);
     }
 
-    private onNotesChanged() {
-        this.all_notes[this.selected_file] = this.notes.toJSON();
-        this.saveNotes();
-    }
-
-    private saveNotes() {
-        this.files.updateNotes(this.selected_file, this.all_notes[this.selected_file].length != 0);
-        api.setNotes(JSON.stringify(this.all_notes), () => {
+    updateNotes(file: string, notes: {[path: string]: {[key: string]: any}[]}) {
+        this.files.updateNotes(file, notes[file].length != 0);
+        api.setNotes(JSON.stringify(notes), () => {
             window.status = "Saved";
         })
     }

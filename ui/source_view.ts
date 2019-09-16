@@ -22,7 +22,7 @@ class SourceView {
 
     private setEvents() {
         this.container.addEventListener('mousedown', (ev) => {
-            console.log('down', ev.pageX, ev.pageY, ev);
+            // console.log('down', ev.pageX, ev.pageY, ev);
             this.onUserSelect(ev.pageX, ev.pageY, 'start');
         });
         this.container.addEventListener('mousemove', (ev) => {
@@ -30,11 +30,11 @@ class SourceView {
             this.onUserSelect(ev.pageX, ev.pageY, 'move');
         });
         this.container.addEventListener('mouseup', (ev) => {
-            console.log('up', ev.pageX, ev.pageY, ev);
+            // console.log('up', ev.pageX, ev.pageY, ev);
             this.onUserSelect(ev.pageX, ev.pageY, 'end');
         });
         this.container.addEventListener('mouseleave', (ev) => {
-            console.log('leave', ev.pageX, ev.pageY, ev);
+            // console.log('leave', ev.pageX, ev.pageY, ev);
             this.onUserSelect(ev.pageX, ev.pageY, 'leave');
         });
     }
@@ -86,13 +86,13 @@ class SourceView {
 
         let line = this.renderedLines[0];
 
-        console.log(x, y);
+        // console.log(x, y);
 
         let height = line.elem.getBoundingClientRect().height;
         let margin = line.codeElem.getBoundingClientRect().left -
                      this.container.getBoundingClientRect().left;
 
-        console.log(height, margin);
+        // console.log(height, margin);
 
         let lineNo = Math.floor(y / height);
 

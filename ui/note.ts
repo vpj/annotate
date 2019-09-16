@@ -29,7 +29,7 @@ class Note {
         this.codeCollapsed = opt['codeCollapsed'] || false;
     }
 
-    getJSON() {
+    toJSON() {
         return {
             'pre': this.pre,
             'post': this.post,

@@ -13,7 +13,6 @@ class Notes {
     notesCount: number;
     lineToNote: {[path: string]: {[lineNo: number]: {[key: string]: boolean}}};
     selected?: NoteElem;
-    changedListener: NoteClickListener;
     selectedFile?: string;
     renderedNotes: NoteElem[];
 
@@ -178,12 +177,12 @@ class Notes {
             this.remove(note);
             if(content != null && content.trim() != '') {
                 let newNote = this.create(note.note.path, content, start, end,
-                        note.note.getJSON());
+                        note.note.toJSON());
                 this.select(newNote.note.path, newNote.key);
             }
         }
 
-        this.changedListener(note.note.path, note.key)
+        this.project.updateNotes(note.note.path, this.toJSON())
     }
 
     private onCollapseCode(note: NoteElem) {
@@ -200,7 +199,7 @@ class Notes {
             }    
         }
 
-        this.changedListener(note.note.path, note.key);
+        this.project.updateNotes(note.note.path, this.toJSON())
     }
 
     remove(note: NoteElem) {
@@ -295,16 +294,18 @@ class Notes {
         return start;
     }
 
-    toJSON() {
-        let json = [];
+    toJSON(): {[path: string]: {[key: string]: any}[]} {
+        let allNotes = {};
         for(let path in this.notes) {
+            let json = [];
             for(let k in this.notes[path]) {
-                let n = this.notes[k][path];
-                json.push(n.note.getJSON());
+                let n = this.notes[path][k];
+                json.push(n.note.toJSON());
             }
+            allNotes[path] = json;
         }
 
-        return json;
+        return allNotes;
     }
 }
 
