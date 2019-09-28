@@ -35,10 +35,10 @@ class FileFolderElem {
             this.elem.appendChild(this.label);
         }
 
-        this.label.addEventListener('click', this.onClick.bind(this));
+        this.label.addEventListener('click', this.onClick);
     }
 
-    protected onClick() {
+    protected onClick = () => {
 
     }
 
@@ -190,15 +190,15 @@ class Files {
         this.top = new FolderElem(null, '', '', fileClickListener);
         this.container.appendChild(this.top.elem);
 
-        this.search.addEventListener('keyup', this.onChange.bind(this));
-        this.search.addEventListener('paste', this.onChange.bind(this));
+        this.search.addEventListener('keyup', this.onChange);
+        this.search.addEventListener('paste', this.onChange);
     }
 
     updateNotes(file: string, hasNotes: boolean) {
         this.files[file].updateNotes(hasNotes);    
     }
 
-    onChange() {
+    onChange = () => {
         console.log(this.search.value);
         this.top.search(this.search.value.toLowerCase());
     }

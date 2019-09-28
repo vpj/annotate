@@ -139,18 +139,18 @@ class NoteElem {
         this.elem.classList.add("note");
 
         this.view = document.createElement('div');
-        this.viewControls = new NoteViewControls(this.onEdit.bind(this),
-                                                this.onRemove.bind(this),
-                                                this.onCollapse.bind(this),
-                                                this.onCodeCollapse.bind(this));
+        this.viewControls = new NoteViewControls(this.onEdit,
+                                                this.onRemove,
+                                                this.onCollapse,
+                                                this.onCodeCollapse);
         this.elem.appendChild(this.view);
         this.elem.appendChild(this.viewControls.elem);
         this.view.className = 'view';
 
-        this.editElem = new NoteEditElem(this.onSave.bind(this));
+        this.editElem = new NoteEditElem(this.onSave);
         this.elem.appendChild(this.editElem.elem);
 
-        this.view.addEventListener('click', this.onClick.bind(this));
+        this.view.addEventListener('click', this.onClick);
         this.setCollapseCss();
     }
 
@@ -158,12 +158,12 @@ class NoteElem {
         return this.elem !== null;
     }
 
-    private onCodeCollapse() {
+    private onCodeCollapse = () => {
         this.note.codeCollapsed = !this.note.codeCollapsed;
         this.collapseListener(this.note.path, this.key);
     }
 
-    private onCollapse() {
+    private onCollapse = () => {
         this.note.collapsed = !this.note.collapsed;
         this.setCollapseCss();
         this.updateListener(this, true, null, null, null);
@@ -177,11 +177,11 @@ class NoteElem {
         }
     }
 
-    private onEdit() {
+    private onEdit = () => {
         this.edit()
     }
     
-    private onRemove() {
+    private onRemove = () => {
         this.updateListener(this, false, null, null, null);
     }
 
@@ -191,7 +191,7 @@ class NoteElem {
         this.editElem.focusEdit();
     }
 
-    private onSave() {
+    private onSave = () => {
         let start = this.editElem.getStart();
         let end = this.editElem.getEnd();
         let content = this.editElem.getContent();
@@ -230,7 +230,7 @@ class NoteElem {
         this.elem.classList.remove("selected");
     }
 
-    private onClick() {
+    private onClick = () => {
         this.clickListener(this.note.path, this.key);
     }
 }

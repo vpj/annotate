@@ -58,7 +58,7 @@ class LineElem {
         this.addCommentIcon = createIcon('plus');
         this.addCommentIcon.classList.add('add_comment');
         this.elem.appendChild(this.addCommentIcon);
-        this.addCommentIcon.addEventListener('click', this.onAddCommentClick.bind(this));
+        this.addCommentIcon.addEventListener('click', this.onAddCommentClick);
 
         this.hasComments = createIcon('comment');
         this.hasComments.classList.add('has_comments');
@@ -80,9 +80,9 @@ class LineElem {
             this.elem.appendChild(this.codeElem);
         }
 
-        this.codeElem.addEventListener('click', this.onLineClick.bind(this));
-        this.hasComments.addEventListener('click', this.onLineClick.bind(this));
-        this.hasCommentsMany.addEventListener('click', this.onLineClick.bind(this));
+        this.codeElem.addEventListener('click', this.onLineClick);
+        this.hasComments.addEventListener('click', this.onLineClick);
+        this.hasCommentsMany.addEventListener('click', this.onLineClick);
 
         this.setCommentsCss();
         this.setCollapsedCss();
@@ -98,11 +98,11 @@ class LineElem {
         this.elem = null;
     }
 
-    private onAddCommentClick() {
+    private onAddCommentClick = () => {
         this.addListener(this.path, this.lineNo, this.lineNo);
     }
 
-    private onLineClick() {
+    private onLineClick = () => {
         this.clickListener(this.path, this.lineNo);
     }
 

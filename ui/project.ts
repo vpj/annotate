@@ -19,11 +19,11 @@ class Project {
     constructor() {
         this.sourceMatcher = new SourceCodeMatcher();
         this.sourceView = new SourceView(document.getElementById('source_code'),
-            this.onCodeClick.bind(this),
-            this.onNoteAdd.bind(this));
+            this.onCodeClick,
+            this.onNoteAdd);
         this.notes = new Notes(document.getElementById("notes"), this);
         this.files = new Files(document.getElementById("files"),
-            this.onFileClick.bind(this));      
+            this.onFileClick);      
     }
 
     selectFile(path: string) {
@@ -64,15 +64,15 @@ class Project {
         })        
     }
     
-    private onFileClick(file: string) {
+    private onFileClick = (file: string) => {
         this.selectFile(file);
     }
 
-    private onCodeClick(path: string, lineNo: number) {
+    private onCodeClick = (path: string, lineNo: number) => {
         this.notes.moveToLine(path, lineNo);
     }
 
-    private onNoteAdd(path: string, start: number, end: number) {
+    private onNoteAdd = (path: string, start: number, end: number) => {
         this.notes.newNote(path, start, end);
     }
 

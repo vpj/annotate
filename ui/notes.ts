@@ -15,6 +15,7 @@ class Notes {
     selected?: NoteElem;
     selectedFile?: string;
     renderedNotes: NoteElem[];
+    notesSearch: HTMLInputElement;
 
     constructor(container: HTMLElement, project: Project) {
         this.notes = {};
@@ -25,7 +26,41 @@ class Notes {
         this.selected = null;
         this.selectedFile = null;
         this.renderedNotes = [];
+        this.notesSearch = <HTMLInputElement>document.getElementById('notes_search');
+        this.notesSearch.addEventListener('keyup', this.onSearch);
+        this.notesSearch.addEventListener('change', this.onSearch);
+        this.notesSearch.addEventListener('paste', this.onSearch);
     }
+
+    onSearch = () => {
+        let search = this.notesSearch.value;
+
+        let selected: NoteElem[] = [];
+        for(let path in this.notes) {
+            let notes = this.notes[path];
+            for(let key in notes) {
+                let note = notes[key];
+                if(note.note.note.toLowerCase().indexOf(search) !== -1) {
+                    selected.push(note);
+                }
+            }
+        }
+
+        this.removeAll();
+        this.project.sourceView.search();
+
+        for(const note of selected) {
+            this.project.sourceView.selectLines(note.note.path,
+                note.match.start - 10, note.match.end + 10);
+        }
+
+        this.project.sourceView.renderSelectedLines();
+
+        for(const note of selected) {
+                this.renderNote(note);
+        }
+    }
+
 
     private renderNote(note: NoteElem) {
         note.render();
@@ -81,9 +116,9 @@ class Notes {
         let match = this.project.sourceMatcher.match(note);
         let key = `${this.notesCount}`;
         let elem = new NoteElem(key, note, match, 
-            this.onNoteClick.bind(this),
-            this.onUpdate.bind(this),
-            this.onCollapseCode.bind(this));
+            this.onNoteClick,
+            this.onUpdate,
+            this.onCollapseCode);
 
         this.notesCount++;
         if(!(note.path in this.notes)) {
@@ -128,7 +163,7 @@ class Notes {
         }
     }
 
-    private onNoteClick(path: string, key: string) {
+    private onNoteClick = (path: string, key: string) => {
         const note = this.notes[path][key];
         if(this.selected === note) {
             this.clearSelected();
@@ -169,7 +204,7 @@ class Notes {
         return noteElem;
     }
 
-    private onUpdate(note: NoteElem, isSaveOnly: boolean, start: number, end: number, content: string) {
+    private onUpdate = (note: NoteElem, isSaveOnly: boolean, start: number, end: number, content: string) => {
         if(!isSaveOnly) {
             if(this.selected === note) {
                 this.clearSelected();
@@ -185,7 +220,8 @@ class Notes {
         this.project.updateNotes(note.note.path, this.toJSON())
     }
 
-    private onCollapseCode(note: NoteElem) {
+    private onCollapseCode = (path: string, key: string) => {
+        let note = this.notes[path][key];
         let match = note.match;
         if(note.note.codeCollapsed) {
             this.project.sourceView.setCollapsedHeader(note.note.path, match.start, true);

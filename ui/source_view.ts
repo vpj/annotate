@@ -4,11 +4,12 @@ import { getLanguage } from "./util";
 class SourceView {
     renderedLines: LineElem[]
     allLines: {[path: string]: LineElem[]}
-    selected_file: string
+    selectedFile: string
     lineClickListener: LineClickListener;
     noteAddListener: NoteAddListener;
     container: HTMLElement;
     userSelection?: any
+    selectedLines: {[path: string]: {[lineNo: number]: boolean}};
 
     constructor(container: HTMLElement, lineClickListener: LineClickListener, noteAddListener: NoteAddListener) {
         this.allLines = {};
@@ -46,8 +47,50 @@ class SourceView {
         this.renderedLines = [];
     }
 
+    search() {
+        this.selectedFile = null;
+        this.selectedLines = {};
+        this.removeAll();
+    }
+
+    selectLines(path: string, start: number, end: number) {
+        let lines = this.allLines[path];
+
+        start = Math.max(0, start);
+        end = Math.min(lines.length - 1, end);
+
+        if(this.selectedLines[path] == null) {
+            this.selectedLines[path] = {};
+
+        } 
+        for(let i = start; i < end; ++i) {
+            this.selectedLines[path][i] = true;
+        }
+    }
+
+    renderSelectedLines() {
+        for(let path in this.selectedLines) {
+            let lineNos: number[] = [];
+            for(let lineNo in this.selectedLines[path]) {
+                lineNos.push(parseInt(lineNo));
+            }
+
+            lineNos.sort();
+            let prev: number = null;
+            for(let lineNo of lineNos) {
+                let line = this.allLines[path][lineNo];
+                if(prev != null && prev !== lineNo - 1) {
+                    //add break
+                }
+                line.render(this.renderedLines.length);
+                this.renderedLines.push(line);
+                this.container.appendChild(line.elem);
+            }
+        }
+    }
+
     selectFile(path: string) {
-        this.selected_file = path;
+        this.selectedFile = path;
         this.removeAll();
         let lines = this.allLines[path];
 
@@ -123,7 +166,7 @@ class SourceView {
             let f = Math.min(this.userSelection.start, this.userSelection.end);
             let t = Math.max(this.userSelection.start, this.userSelection.end);
             if(f != t) {
-                this.noteAddListener(this.selected_file, f, t)
+                this.noteAddListener(this.selectedFile, f, t)
             }
             this.clearUserSelection();
         }
