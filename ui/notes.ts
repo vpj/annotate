@@ -40,7 +40,7 @@ class Notes {
         }
 
         this.searchTerm = search;
-        this.selectFile = null;
+        this.selectedFile = null;
         let selected: NoteElem[] = [];
         for(let path in this.notes) {
             let notes = this.notes[path];

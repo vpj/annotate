@@ -67,8 +67,8 @@ h6 {
   color: #ccc; }
 
 code {
-  padding: .2rem .5rem;
-  margin: 0 .2rem;
+  padding: 0.2rem 0.5rem;
+  margin: 0 0.2rem;
   font-size: 80%;
   white-space: nowrap;
   background: #282a36;
@@ -153,15 +153,22 @@ code {
 
 .line:hover {
   background: rgba(0, 0, 0, 0.9) !important; }
-
-.line:hover > .add_comment {
-  visibility: visible; }
+  .line:hover > .add_comment {
+    visibility: visible; }
 
 .line > .add_comment {
   visibility: hidden;
   cursor: pointer;
   padding: 0 10px 0 10px;
-  color: #4CAF50; }
+  color: #4caf50; }
+
+.line > .has_comments {
+  visibility: hidden;
+  cursor: pointer; }
+
+.line > .has_comments_many {
+  display: none;
+  cursor: pointer; }
 
 .line.commented_many > .has_comments {
   display: none; }
@@ -171,14 +178,6 @@ code {
 
 .line.commented > .has_comments {
   visibility: visible; }
-
-.line > .has_comments {
-  visibility: hidden;
-  cursor: pointer; }
-
-.line > .has_comments_many {
-  display: none;
-  cursor: pointer; }
 
 .line.collapsed_header:after {
   content: "...";
@@ -204,7 +203,7 @@ code {
 div.note.selected {
   margin: 30px 0 30px 0;
   padding: 15px 15px 1px 15px;
-  opacity: 1.0;
+  opacity: 1;
   box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
   background: rgba(0, 0, 0, 0.5); }
 
@@ -216,15 +215,27 @@ div.note {
   opacity: 0.7;
   background: rgba(0, 0, 0, 0.1);
   position: relative; }
-
-div.note > div.edit {
-  display: none; }
-
-div.note > div.view > div.MathJax_Display {
-  user-select: none; }
-
-div.note > div.view_controls {
-  display: none; }
+  div.note > div.edit {
+    display: none; }
+  div.note > div.edit > textarea {
+    width: 100%;
+    height: 250px; }
+  div.note > div.view > div.MathJax_Display {
+    user-select: none; }
+  div.note > div.view_controls {
+    display: none;
+    padding-bottom: 10px;
+    text-align: right; }
+  div.note > div.view_controls > i {
+    opacity: 0.3;
+    cursor: pointer;
+    padding: 0 10px 0 10px; }
+  div.note > div.view_controls > i.edit_button {
+    color: #2196f3; }
+  div.note > div.view_controls > i.remove_button {
+    color: #f44336; }
+  div.note > div.view_controls > i:hover {
+    opacity: 1; }
 
 div.note.selected > div.view_controls {
   display: block; }
@@ -234,28 +245,6 @@ div.note.editing > div.edit {
 
 div.note.editing > div.view_controls {
   display: none; }
-
-div.note > div.edit > textarea {
-  width: 100%;
-  height: 250px; }
-
-div.note > div.view_controls {
-  padding-bottom: 10px;
-  text-align: right; }
-
-div.note > div.view_controls > i {
-  opacity: 0.3;
-  cursor: pointer;
-  padding: 0 10px 0 10px; }
-
-div.note > div.view_controls > i.edit_button {
-  color: #2196F3; }
-
-div.note > div.view_controls > i.remove_button {
-  color: #F44336; }
-
-div.note > div.view_controls > i:hover {
-  opacity: 1; }
 
 div.note.collapsed > div.view {
   max-height: 50px; }
@@ -287,24 +276,19 @@ div.note > div.view {
   line-height: 24px;
   font-family: Monaco, Consolas, "Lucida Console", monospace;
   font-size: 12px; }
-
-#files div.folder {
-  margin-left: 10px;
-  cursor: pointer; }
-
-#files > div.folder {
-  margin-left: -10px; }
-
-#files div.folder > div.label > span {
-  color: #999; }
-
-#files div.label > i {
-  margin-right: 5px; }
-
-#files div.file {
-  color: #aaa;
-  margin-left: 10px;
-  cursor: pointer; }
+  #files div.folder {
+    margin-left: 10px;
+    cursor: pointer; }
+    #files div.folder > div.label > span {
+      color: #999; }
+  #files > div.folder {
+    margin-left: -10px; }
+  #files div.label > i {
+    margin-right: 5px; }
+  #files div.file {
+    color: #aaa;
+    margin-left: 10px;
+    cursor: pointer; }
 
 .project_panel {
   position: fixed;

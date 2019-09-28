@@ -13,7 +13,7 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                     return;
                 }
                 _this.searchTerm = search;
-                _this.selectFile = null;
+                _this.selectedFile = null;
                 var selected = [];
                 for (var path in _this.notes) {
                     var notes = _this.notes[path];
