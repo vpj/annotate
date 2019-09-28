@@ -1,0 +1,203 @@
+define(["require", "exports", "./line", "./util"], function (require, exports, line_1, util_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var SourceView = /** @class */ (function () {
+        function SourceView(container, lineClickListener, noteAddListener) {
+            this.allLines = {};
+            this.renderedLines = [];
+            this.container = container;
+            this.lineClickListener = lineClickListener;
+            this.noteAddListener = noteAddListener;
+            this.setEvents();
+        }
+        SourceView.prototype.setEvents = function () {
+            var _this = this;
+            this.container.addEventListener('mousedown', function (ev) {
+                // console.log('down', ev.pageX, ev.pageY, ev);
+                _this.onUserSelect(ev.pageX, ev.pageY, 'start');
+            });
+            this.container.addEventListener('mousemove', function (ev) {
+                // console.log('move', ev.pageX, ev.pageY, ev);
+                _this.onUserSelect(ev.pageX, ev.pageY, 'move');
+            });
+            this.container.addEventListener('mouseup', function (ev) {
+                // console.log('up', ev.pageX, ev.pageY, ev);
+                _this.onUserSelect(ev.pageX, ev.pageY, 'end');
+            });
+            this.container.addEventListener('mouseleave', function (ev) {
+                // console.log('leave', ev.pageX, ev.pageY, ev);
+                _this.onUserSelect(ev.pageX, ev.pageY, 'leave');
+            });
+        };
+        SourceView.prototype.removeAll = function () {
+            for (var _i = 0, _a = this.renderedLines; _i < _a.length; _i++) {
+                var line = _a[_i];
+                line.remove();
+            }
+            this.renderedLines = [];
+        };
+        SourceView.prototype.search = function () {
+            this.selectedFile = null;
+            this.selectedLines = {};
+            this.removeAll();
+        };
+        SourceView.prototype.selectLines = function (path, start, end) {
+            var lines = this.allLines[path];
+            start = Math.max(0, start);
+            end = Math.min(lines.length - 1, end);
+            if (this.selectedLines[path] == null) {
+                this.selectedLines[path] = {};
+            }
+            for (var i = start; i < end; ++i) {
+                this.selectedLines[path][i] = true;
+            }
+        };
+        SourceView.prototype.renderSelectedLines = function () {
+            for (var path in this.selectedLines) {
+                var lineNos = [];
+                for (var lineNo in this.selectedLines[path]) {
+                    lineNos.push(parseInt(lineNo));
+                }
+                lineNos.sort();
+                var prev = null;
+                for (var _i = 0, lineNos_1 = lineNos; _i < lineNos_1.length; _i++) {
+                    var lineNo = lineNos_1[_i];
+                    var line = this.allLines[path][lineNo];
+                    if (prev != null && prev !== lineNo - 1) {
+                        //add break
+                    }
+                    line.render(this.renderedLines.length);
+                    this.renderedLines.push(line);
+                    this.container.appendChild(line.elem);
+                }
+            }
+        };
+        SourceView.prototype.selectFile = function (path) {
+            this.selectedFile = path;
+            this.removeAll();
+            var lines = this.allLines[path];
+            for (var i = 0; i < lines.length; ++i) {
+                var elem = lines[i];
+                elem.render(i);
+                this.renderedLines.push(elem);
+                this.container.appendChild(elem.elem);
+            }
+        };
+        SourceView.prototype.load = function (files) {
+            for (var path in files) {
+                var lines = files[path];
+                this.allLines[path] = [];
+                var language = util_1.getLanguage(path);
+                for (var i = 0; i < lines.length; ++i) {
+                    var elem = new line_1.LineElem(path, i, lines[i], language, this.lineClickListener, this.noteAddListener);
+                    this.allLines[path].push(elem);
+                }
+            }
+        };
+        SourceView.prototype.getRenderedLineRank = function (path, lineNo) {
+            return this.allLines[path][lineNo].rank;
+        };
+        SourceView.prototype.onUserSelect = function (x, y, event) {
+            if (this.renderedLines.length == 0)
+                return;
+            x -= this.container.getBoundingClientRect().left;
+            y -= this.container.getBoundingClientRect().top;
+            var line = this.renderedLines[0];
+            // console.log(x, y);
+            var height = line.elem.getBoundingClientRect().height;
+            var margin = line.codeElem.getBoundingClientRect().left -
+                this.container.getBoundingClientRect().left;
+            // console.log(height, margin);
+            var lineNo = Math.floor(y / height);
+            if (event == 'start') {
+                if (x >= margin) {
+                    this.clearUserSelection();
+                    return;
+                }
+                this.userSelection = {
+                    start: lineNo,
+                    end: lineNo
+                };
+                this.markUserSelection();
+            }
+            else if (event == 'move') {
+                if (this.userSelection == null)
+                    return;
+                this.userSelection.end = lineNo;
+                this.markUserSelection();
+            }
+            else if (event == 'leave') {
+                if (this.userSelection == null)
+                    return;
+                this.clearUserSelection();
+            }
+            else {
+                if (this.userSelection == null)
+                    return;
+                var f = Math.min(this.userSelection.start, this.userSelection.end);
+                var t = Math.max(this.userSelection.start, this.userSelection.end);
+                if (f != t) {
+                    this.noteAddListener(this.selectedFile, f, t);
+                }
+                this.clearUserSelection();
+            }
+        };
+        SourceView.prototype.markUserSelection = function () {
+            for (var _i = 0, _a = this.renderedLines; _i < _a.length; _i++) {
+                var l = _a[_i];
+                l.userSelect(false);
+            }
+            if (this.userSelection == null)
+                return;
+            var f = Math.min(this.userSelection.start, this.userSelection.end);
+            var t = Math.max(this.userSelection.start, this.userSelection.end);
+            for (var i = f; i <= t; ++i) {
+                this.renderedLines[i].userSelect(true);
+            }
+        };
+        SourceView.prototype.clearUserSelection = function () {
+            this.userSelection = null;
+            this.markUserSelection();
+        };
+        SourceView.prototype.addComment = function (path, lineNo) {
+            this.allLines[path][lineNo].addComment();
+        };
+        SourceView.prototype.removeComment = function (path, lineNo) {
+            this.allLines[path][lineNo].removeComment();
+        };
+        SourceView.prototype.setCollapsedHeader = function (path, lineNo, isHeader) {
+            this.allLines[path][lineNo].setCollapsedHeader(isHeader);
+        };
+        SourceView.prototype.setCollapsed = function (path, lineNo, isCollapsed) {
+            this.allLines[path][lineNo].setCollapsed(isCollapsed);
+        };
+        SourceView.prototype.setSelected = function (path, lineNo, isSelected) {
+            this.allLines[path][lineNo].setSelected(isSelected);
+        };
+        SourceView.prototype.getY = function (path, lineNo) {
+            return this.allLines[path][lineNo].getY();
+        };
+        SourceView.prototype.scroll = function (path, lineNo, offset) {
+            var line = this.allLines[path][lineNo];
+            if (!line.isRendered()) {
+                return;
+            }
+            var node = this.container;
+            var containerOffset = 0;
+            while (node != null) {
+                containerOffset += node.offsetTop;
+                node = node.parentElement;
+            }
+            window.scroll(0, line.getY() + containerOffset - Math.round(offset));
+        };
+        SourceView.prototype.getCode = function (path, lineNo) {
+            var lines = this.allLines[path];
+            if (lineNo < 0 || lineNo >= lines.length) {
+                return null;
+            }
+            return lines[lineNo];
+        };
+        return SourceView;
+    }());
+    exports.SourceView = SourceView;
+});

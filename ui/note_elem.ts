@@ -4,23 +4,15 @@ import {Note} from "./note";
 import { createIcon } from "./util";
 
 interface NoteClickListener {
-    (noteKey: string): void
+    (path: string, key: string): void
 }
 
-interface NoteEditListener {
-    (): void
-}
-
-interface NotesChangedListener {
-    (): void
-}
-
-interface NoteSaveListener {
+interface NoteListener {
     (): void
 }
 
 interface NoteUpdateListener {
-    (noteElem: NoteElem, start: number, end: number, content: string): void
+    (noteElem: NoteElem, isSaveOnly: boolean, start: number, end: number, content: string): void
 }
 
 
@@ -30,9 +22,8 @@ class NoteEditElem {
     start: HTMLInputElement;
     end: HTMLInputElement;
     textArea: HTMLTextAreaElement;
-    saveListener: NoteSaveListener
 
-    constructor(saveListener: NoteSaveListener) {
+    constructor(saveListener: NoteListener) {
         this.elem = document.createElement('div')
         this.elem.className = 'edit';
 
@@ -51,15 +42,7 @@ class NoteEditElem {
         this.button.textContent = 'Save';
         this.elem.appendChild(this.button);
 
-        this.button.addEventListener('click', this.onSaveClick.bind(this));
-
-        this.saveListener = saveListener;
-    }
-
-    private onSaveClick() {
-        if(this.saveListener != null) {
-            this.saveListener();
-        }
+        this.button.addEventListener('click', saveListener);
     }
 
     focusEdit() {
@@ -91,13 +74,11 @@ class NoteViewControls {
     collapse: HTMLElement;
     codeCollapse: HTMLElement;
     remove: HTMLElement;
-    editListener: NoteEditListener
-    removeListener: NoteEditListener
 
-    constructor(editListener: NoteEditListener,
-               removeListener: NoteEditListener,
-               collapseListener: NoteEditListener,
-               codeCollapseListener: NoteEditListener) {
+    constructor(editListener: NoteListener,
+               removeListener: NoteListener,
+               collapseListener: NoteListener,
+               codeCollapseListener: NoteListener) {
         this.elem = document.createElement('div')
         this.elem.className = 'view_controls';
 
@@ -115,29 +96,16 @@ class NoteViewControls {
         this.edit.classList.add('edit_button');
         this.elem.appendChild(this.edit);
 
-        this.edit.addEventListener('click', this.onEditClick.bind(this));
-        this.editListener = editListener;
+        this.edit.addEventListener('click', editListener);
 
         this.remove = createIcon('trash');
         this.remove.classList.add('remove_button');
         this.elem.appendChild(this.remove);
 
-        this.remove.addEventListener('click', this.onRemoveClick.bind(this));
-        this.removeListener = removeListener;
-    }
-
-    private onEditClick() {
-        if(this.editListener != null) {
-            this.editListener();
-        }
-    }
-
-    private onRemoveClick() {
-        if(this.removeListener != null) {
-            this.removeListener();
-        }
+        this.remove.addEventListener('click', removeListener);
     }
 }
+
 
 class NoteElem {
     note: Note;
@@ -158,41 +126,50 @@ class NoteElem {
         this.key = key;
         this.note = note;
         this.match = match;
+
+        this.clickListener = clickListener;
+        this.updateListener = updateListener;
+        this.collapseListener = collapseListener;
+
+        this.elem = null;
+    }
+
+    render() {
         this.elem = document.createElement('div');
         this.elem.classList.add("note");
 
         this.view = document.createElement('div');
-        this.viewControls = new NoteViewControls(this.onEdit.bind(this),
-                                                this.onRemove.bind(this),
-                                                this.onCollapse.bind(this),
-                                                this.onCodeCollapse.bind(this));
+        this.viewControls = new NoteViewControls(this.onEdit,
+                                                this.onRemove,
+                                                this.onCollapse,
+                                                this.onCodeCollapse);
         this.elem.appendChild(this.view);
         this.elem.appendChild(this.viewControls.elem);
         this.view.className = 'view';
 
-        this.editElem = new NoteEditElem(this.onSave.bind(this));
+        this.editElem = new NoteEditElem(this.onSave);
         this.elem.appendChild(this.editElem.elem);
 
-        this.clickListener = clickListener;
-
-        this.view.addEventListener('click', this.onClick.bind(this));
-        this.updateListener = updateListener;
-        this.collapseListener = collapseListener;
-        this.setCollapse();
+        this.view.addEventListener('click', this.onClick);
+        this.setCollapseCss();
     }
 
-    private onCodeCollapse() {
+    isRendered(): boolean {
+        return this.elem !== null;
+    }
+
+    private onCodeCollapse = () => {
         this.note.codeCollapsed = !this.note.codeCollapsed;
-        this.collapseListener(this.key);
+        this.collapseListener(this.note.path, this.key);
     }
 
-    private onCollapse() {
+    private onCollapse = () => {
         this.note.collapsed = !this.note.collapsed;
-        this.setCollapse();
-        this.updateListener(null, null, null, null);
+        this.setCollapseCss();
+        this.updateListener(this, true, null, null, null);
     }
 
-    private setCollapse() {
+    private setCollapseCss() {
         if(this.note.collapsed) {
             this.elem.classList.add('collapsed');
         } else {
@@ -200,12 +177,12 @@ class NoteElem {
         }
     }
 
-    private onEdit() {
+    private onEdit = () => {
         this.edit()
     }
     
-    private onRemove() {
-        this.updateListener(this, null, null, null);
+    private onRemove = () => {
+        this.updateListener(this, false, null, null, null);
     }
 
     edit() {
@@ -214,12 +191,12 @@ class NoteElem {
         this.editElem.focusEdit();
     }
 
-    private onSave() {
+    private onSave = () => {
         let start = this.editElem.getStart();
         let end = this.editElem.getEnd();
         let content = this.editElem.getContent();
 
-        this.updateListener(this, start, end, content);
+        this.updateListener(this, false, start, end, content);
     }
 
     update() {
@@ -236,7 +213,8 @@ class NoteElem {
     }
 
     remove() {
-        this.elem.remove();
+        this.elem.parentElement.removeChild(this.elem);
+        this.elem = null;
     }
 
     getY() {
@@ -252,11 +230,9 @@ class NoteElem {
         this.elem.classList.remove("selected");
     }
 
-    private onClick() {
-        if(this.clickListener != null) {
-            this.clickListener(this.key);
-        }
+    private onClick = () => {
+        this.clickListener(this.note.path, this.key);
     }
 }
 
-export {NoteElem, NoteClickListener, NotesChangedListener}
+export {NoteElem, NoteClickListener}

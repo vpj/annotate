@@ -10,7 +10,7 @@ class NoteMatch {
     }
 } 
 
-class SourceCode {
+class FileSourceCodeMatcher {
     lines: Array<string>;
     lineNumbers: {[line: string]: number[]};
     actualLineNumbers: {[lineno: number]: number};
@@ -23,7 +23,7 @@ class SourceCode {
         this.load(lines);
     }
 
-    load(lines: string[]) {
+    private load(lines: string[]) {
         this.lines = lines;
         this.lineNumbers = {};
         this.actualLineNumbers = {};
@@ -175,4 +175,22 @@ class SourceCode {
     }
 }
 
-export {NoteMatch, SourceCode};
+class SourceCodeMatcher {
+    private files: {[path: string]: FileSourceCodeMatcher}
+
+    constructor() {
+        this.files = {};
+    }
+
+    load(all_files: {[path: string]: string[]}) {
+        for(let path in all_files) {
+            this.files[path] = new FileSourceCodeMatcher(all_files[path]);
+        }
+    }
+
+    match(note: Note): NoteMatch {
+        return this.files[note.path].match(note);
+    }
+}
+
+export {NoteMatch, SourceCodeMatcher};

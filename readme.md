@@ -21,8 +21,6 @@ and for collaboration.
 
 ## How to use
 
-Compile `TypeScript` files in folder `ui` using compile directives defined in `tsconfig.ts`.
-
 Run `server/ann.py` from the folder with your python source code.
 
 Go to `localhost:8888/static/index.html`

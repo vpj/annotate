@@ -1,0 +1,7 @@
+{
+    "files.exclude": {
+        "css/": true,
+        "js/": true,
+        "lib/": true
+    }
+}
