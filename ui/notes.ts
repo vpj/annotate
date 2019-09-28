@@ -16,6 +16,7 @@ class Notes {
     selectedFile?: string;
     renderedNotes: NoteElem[];
     notesSearch: HTMLInputElement;
+    searchTerm: string;
 
     constructor(container: HTMLElement, project: Project) {
         this.notes = {};
@@ -34,7 +35,12 @@ class Notes {
 
     onSearch = () => {
         let search = this.notesSearch.value;
+        if(search === this.searchTerm) {
+            return
+        }
 
+        this.searchTerm = search;
+        this.selectFile = null;
         let selected: NoteElem[] = [];
         for(let path in this.notes) {
             let notes = this.notes[path];
@@ -46,7 +52,6 @@ class Notes {
             }
         }
 
-        this.removeAll();
         this.project.sourceView.search();
 
         for(const note of selected) {
@@ -56,8 +61,9 @@ class Notes {
 
         this.project.sourceView.renderSelectedLines();
 
+        this.removeAll();
         for(const note of selected) {
-                this.renderNote(note);
+            this.renderNote(note);
         }
     }
 
@@ -155,6 +161,7 @@ class Notes {
 
     selectFile(path: string) {
         this.selectedFile = path;
+        this.searchTerm = null;
         this.removeAll();
         let notes = this.notes[path];
 

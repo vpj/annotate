@@ -1,0 +1,383 @@
+/*--------------------- Layout and Typography ----------------------------*/
+
+html {
+    font-size: 62.5%;
+  }
+  
+  body {
+    font-size: 1.5em;
+    line-height: 1.6;
+    font-weight: 500;
+    font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #999;
+    margin: 0;
+    padding: 0;
+    background: #282a36;
+  }
+  
+  hr {
+      border-color: #555;
+      border-style: solid;
+      border-bottom: none;
+  }
+  
+  pre>code {
+    display: block;
+    padding: 1rem 1.5rem;
+    white-space: pre;
+  }
+  
+  a {
+    color: #bbb;
+  }
+  
+  a:visited {
+    color: #aaa;
+  }
+  
+  p {
+    margin: 0 0 15px 0;
+  }
+  
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 40px 0 15px 0;
+  }
+  
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 0;
+  }
+  
+  #container {
+    background: #282c34;
+  }
+  
+  .notes_panel pre {
+    margin: 15px 0 15px;
+  }
+  
+  .notes_panel p tt,
+  .notes_panel li code,
+  .notes_panel ol code,
+  .notes_panel p code {
+    background: #282a36;
+    border: none;
+    border-radius: 1px;
+    font-size: 12px;
+    padding: 0 0.2em;
+    color: #ccc;
+  }
+  
+  .mjx-chtml {
+    color: #ccc;
+  }
+  
+  code {
+    padding: .2rem .5rem;
+    margin: 0 .2rem;
+    font-size: 80%;
+    white-space: nowrap;
+    background: #282a36;
+    border: 1px solid #484a56;
+    border-radius: 4px;
+  }
+  
+  .octowrap {
+    position: relative;
+  }
+  
+  .octothorpe {
+    font: 12px Arial;
+    text-decoration: none;
+    color: #454545;
+    position: absolute;
+    top: 3px;
+    left: -20px;
+    padding: 1px 2px;
+    opacity: 0;
+    transition: opacity 0.2s linear;
+  }
+  
+  div.docs:hover .octothorpe {
+    opacity: 1;
+  }
+  
+  div.code {
+    margin-left: 550px;
+    padding: 0px 15px 16px 50px;
+    vertical-align: top;
+  }
+  
+  .code_panel pre {
+    font-size: 12px;
+  }
+  
+  pre,
+  tt,
+  code {
+    line-height: 18px;
+    font-family: Monaco, Consolas, "Lucida Console", monospace;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .line_no {
+    display: inline-block;
+    padding-right: 10px;
+    width: 30px;
+    text-align: right;
+    color: #666;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .column {
+    float: left;
+    box-sizing: border-box;
+  }
+  
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  .notes_panel {
+    width: 30%;
+    position: relative;
+    min-height: 10px;
+    padding: 0px 25px 1px 25px;
+    color: #ccc;
+    /* overflow: hidden; */
+  }
+  
+  .project_panel {
+    width: 20%;
+    min-height: 10px;
+    position: relative;
+  }
+  
+  .code_panel {
+    width: 50%;
+    position: relative;
+    overflow-x: scroll;
+  }
+  
+  
+  #notes {
+    position: relative;
+  }
+  
+  #note_text {
+    width: 320px;
+    height: 80px;
+  }
+  
+  .line:hover {
+    background: rgba(0, 0, 0, 0.9) !important;
+  }
+  
+  .line:hover > .add_comment {
+    visibility: visible;
+  }
+  
+  .line > .add_comment {
+    visibility: hidden;
+    cursor: pointer;
+    padding: 0 10px 0 10px;
+    color: #4CAF50;
+  }
+  
+  .line.commented_many > .has_comments {
+    display: none;
+  }
+  
+  .line.commented_many > .has_comments_many {
+    display: inline-block;
+  }
+  
+  .line.commented > .has_comments {
+    visibility: visible;
+  }
+  
+  .line > .has_comments {
+    visibility: hidden;
+    cursor: pointer;
+  }
+  .line > .has_comments_many {
+    display: none;
+    cursor: pointer;
+  }
+  
+  .line.collapsed_header:after {
+    content: "...";
+    display: block;
+    padding-left: 30px;
+    font-weight: bold;
+    line-height: 2;
+  }
+  
+  .line.collapsed {
+    display: none;
+  }
+  
+  .line.selected {
+    background: rgba(0, 0, 0, 0.6);
+    display: block;
+  }
+  
+  .line.user_selected {
+    background: #555;
+    display: block;
+  }
+  
+  .line.selected.collapsed_header:after {
+    display: none;
+  }
+  
+  div.note.selected {
+    margin: 30px 0 30px 0;
+    padding: 15px 15px 1px 15px;
+    opacity: 1.0;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  div.note {
+    /* padding: 15px 15px 1px 15px; */
+    /* border: 1px solid white; */
+    padding: 5px 15px 1px 15px;
+    margin: 5px 0 5px 0;
+    opacity: 0.7;
+    background: rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  div.note > div.edit {
+    display: none;
+  }
+  
+  div.note > div.view > div.MathJax_Display {
+    user-select: none;
+  }
+  
+  div.note > div.view_controls {
+    display: none;
+  }
+  
+  div.note.selected > div.view_controls {
+    display: block;
+  }
+  
+  div.note.editing > div.edit {
+    display: block;
+  }
+  
+  div.note.editing > div.view_controls {
+    display: none;
+  }
+  
+  div.note > div.edit > textarea {
+    width: 100%;
+    height: 250px;
+  }
+  
+  div.note > div.view_controls {
+    padding-bottom: 10px;
+    text-align: right;
+  }
+  
+  div.note > div.view_controls > i {
+    opacity: 0.3;
+    cursor: pointer;
+    padding: 0 10px 0 10px;
+  }
+  
+  div.note > div.view_controls > i.edit_button {
+    color: #2196F3;
+  }
+  
+  div.note > div.view_controls > i.remove_button {
+    color: #F44336;
+  }
+  
+  div.note > div.view_controls > i:hover {
+    opacity: 1;
+  }
+  
+  div.note.collapsed > div.view {
+    max-height: 50px;
+  }
+  
+  div.note.collapsed > div.view:after {
+    content: "";
+    position: absolute;
+    display: block;  
+    height: 30px;  
+    background: linear-gradient(rgba(40, 44, 52, .51), rgb(40, 44, 52));  
+    bottom: 0px;  
+    z-index: 1000; 
+    width: 100%;  
+    box-sizing: border-box;  
+    left: 0px;
+    right: 0;
+  }
+  
+  div.note.selected > div.view:after {
+    content: none;
+  }
+  
+  div.note.selected > div.view {
+    max-height: none;
+  }
+  
+  div.note > div.view {
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  #files {
+    line-height: 24px;
+    font-family: Monaco, Consolas, "Lucida Console", monospace;
+    font-size: 12px;
+  }
+  
+  #files div.folder {
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  #files > div.folder {
+    margin-left: -10px;
+  }
+  
+  #files div.folder > div.label > span {
+    color: #999;
+  }
+  
+  #files div.label > i {
+    margin-right: 5px;
+  }
+  
+  #files div.file {
+    color: #aaa;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .project_panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+  
+    overflow: scroll;
+  }

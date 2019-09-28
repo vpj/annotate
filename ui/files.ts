@@ -35,10 +35,10 @@ class FileFolderElem {
             this.elem.appendChild(this.label);
         }
 
-        this.label.addEventListener('click', this.onClick);
+        this.label.addEventListener('click', () => {this.onClick()});
     }
 
-    protected onClick = () => {
+    protected onClick() {
 
     }
 

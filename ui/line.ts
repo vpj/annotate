@@ -103,6 +103,7 @@ class LineElem {
     }
 
     private onLineClick = () => {
+        console.log('click');
         this.clickListener(this.path, this.lineNo);
     }
 
