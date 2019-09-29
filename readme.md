@@ -16,9 +16,6 @@ We intend to use it for  personal note taking to understand code,
 writing [tutorials](http://blog.varunajayasiri.com/ml/transformer.html),
 and for collaboration.
 
-🚧 This project is still in its infant stage,
- and slowly improving.
-
 ## How to use
 
 Run `server/ann.py` from the folder with your python source code.
