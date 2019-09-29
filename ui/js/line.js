@@ -1,4 +1,4 @@
-define(["require", "exports", "./hljs", "./util"], function (require, exports, hljs_1, util_1) {
+define(["require", "exports", "./hljs", "./weya"], function (require, exports, hljs_1, weya_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var LineElem = /** @class */ (function () {
@@ -28,37 +28,23 @@ define(["require", "exports", "./hljs", "./util"], function (require, exports, h
             this.commentKeys = {};
         }
         LineElem.prototype.render = function (rank) {
+            var _this = this;
             this.rank = rank;
-            this.elem = document.createElement('div');
-            this.elem.className = "line";
-            if (this.isShowPath) {
-                var path = document.createElement('div');
-                path.className = "path";
-                path.textContent = this.path;
-                this.elem.appendChild(path);
-            }
-            if (this.isShowBreakBefore) {
-                var breakBefore = document.createElement('div');
-                breakBefore.textContent = '...';
-                this.elem.appendChild(breakBefore);
-            }
-            this.isShowBreakBefore = false;
-            this.isShowPath = false;
-            this.addCommentIcon = util_1.createIcon('plus');
-            this.addCommentIcon.classList.add('add_comment');
-            this.elem.appendChild(this.addCommentIcon);
-            this.addCommentIcon.addEventListener('click', this.onAddCommentClick);
-            this.hasComments = util_1.createIcon('comment');
-            this.hasComments.classList.add('has_comments');
-            this.elem.appendChild(this.hasComments);
-            this.hasCommentsMany = util_1.createIcon('comments');
-            this.hasCommentsMany.classList.add('has_comments_many');
-            this.elem.appendChild(this.hasCommentsMany);
-            this.lineNoElem = document.createElement('span');
+            this.elem = weya_1.Weya('div.line', function ($) {
+                if (_this.isShowPath) {
+                    $('div.path', _this.path);
+                }
+                if (_this.isShowBreakBefore) {
+                    $('div', '...');
+                }
+                _this.isShowBreakBefore = false;
+                _this.isShowPath = false;
+                _this.addCommentIcon = $('i.fas.fa-plus.add_comment', { on: { 'click': _this.onAddCommentClick } });
+                _this.hasComments = $('i.fas.fa-comment.has_comments');
+                _this.hasCommentsMany = $('i.fas.fa-comments.has_comments_many');
+                _this.lineNoElem = $('span.line_no', "" + (_this.lineNo + 1));
+            });
             this.codeElem = document.createElement("span");
-            this.lineNoElem.className = "line_no";
-            this.lineNoElem.textContent = "" + (this.lineNo + 1);
-            this.elem.appendChild(this.lineNoElem);
             if (this.code.trim() !== "") {
                 var h = hljs_1.highlight(this.language, this.code, true, null);
                 this.codeElem.innerHTML = h.value;

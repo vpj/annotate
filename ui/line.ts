@@ -1,5 +1,6 @@
-import {highlight} from "./hljs"
-import {createIcon} from "./util";
+import { highlight } from "./hljs"
+import { createIcon } from "./util";
+import { Weya as $, WeyaElement } from "./weya";
 
 interface LineClickListener {
     (path: string, lineNo: number): void
@@ -17,11 +18,11 @@ class LineElem {
     language: string;
 
     elem?: HTMLDivElement;
-    lineNoElem: HTMLSpanElement;
-    codeElem: HTMLSpanElement;
-    addCommentIcon: HTMLElement;
-    hasComments: HTMLElement;
-    hasCommentsMany: HTMLElement;
+    lineNoElem: WeyaElement;
+    codeElem: WeyaElement;
+    addCommentIcon: WeyaElement;
+    hasComments: WeyaElement;
+    hasCommentsMany: WeyaElement;
     clickListener: LineClickListener;
     addListener: NoteAddListener;
 
@@ -33,7 +34,7 @@ class LineElem {
     rank: number
     isShowPath: boolean;
     isShowBreakBefore: boolean;
-    commentKeys: {[key: string]: boolean};
+    commentKeys: { [key: string]: boolean };
 
     constructor(path: string, lineNo: number, code: string, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
         this.path = path;
@@ -44,7 +45,7 @@ class LineElem {
         this.comments = 0;
         this.collapsed = 0;
         this.collapsedHeader = 0;
-        
+
         this.clickListener = clickListener;
         this.addListener = addListener;
 
@@ -58,45 +59,27 @@ class LineElem {
 
     render(rank: number) {
         this.rank = rank;
-        this.elem = document.createElement('div');
-        this.elem.className = "line";
-        if(this.isShowPath) {
-            let path = document.createElement('div')
-            path.className = "path";
-            path.textContent = this.path;
+        this.elem = <HTMLDivElement>$('div.line', $ => {
+            if (this.isShowPath) {
+                $('div.path', this.path);
+            }
+            if (this.isShowBreakBefore) {
+                $('div', '...');
+            }
+            this.isShowBreakBefore = false;
+            this.isShowPath = false;
 
-            this.elem.appendChild(path);
-        }
-        if(this.isShowBreakBefore) {
-            let breakBefore = document.createElement('div')
-            breakBefore.textContent = '...';
+            this.addCommentIcon = $('i.fas.fa-plus.add_comment', { on: { 'click': this.onAddCommentClick } });
 
-            this.elem.appendChild(breakBefore);
-        }
+            this.hasComments = $('i.fas.fa-comment.has_comments');
+            this.hasCommentsMany = $('i.fas.fa-comments.has_comments_many');
+            
+            this.lineNoElem = $('span.line_no', `${this.lineNo + 1}`)
+        });
 
-        this.isShowBreakBefore = false;
-        this.isShowPath = false;
-
-        this.addCommentIcon = createIcon('plus');
-        this.addCommentIcon.classList.add('add_comment');
-        this.elem.appendChild(this.addCommentIcon);
-        this.addCommentIcon.addEventListener('click', this.onAddCommentClick);
-
-        this.hasComments = createIcon('comment');
-        this.hasComments.classList.add('has_comments');
-        this.elem.appendChild(this.hasComments);
-        this.hasCommentsMany = createIcon('comments');
-        this.hasCommentsMany.classList.add('has_comments_many');
-        this.elem.appendChild(this.hasCommentsMany);
-
-        this.lineNoElem = document.createElement('span');
         this.codeElem = document.createElement("span");
-    
-        this.lineNoElem.className = "line_no";
-        this.lineNoElem.textContent = `${this.lineNo + 1}`;
-        this.elem.appendChild(this.lineNoElem);
-    
-        if(this.code.trim() !== "") {
+
+        if (this.code.trim() !== "") {
             let h = highlight(this.language, this.code, true, null);
             this.codeElem.innerHTML = h.value;
             this.elem.appendChild(this.codeElem);
@@ -127,7 +110,7 @@ class LineElem {
     showBreakBefore() {
         this.isShowBreakBefore = true;
     }
-    
+
     private onAddCommentClick = () => {
         this.addListener(this.path, this.lineNo, this.lineNo);
     }
@@ -138,10 +121,10 @@ class LineElem {
     }
 
     private setCommentsCss() {
-        if(this.comments == 0) {
+        if (this.comments == 0) {
             this.elem.classList.remove("commented");
             this.elem.classList.remove("commented_many");
-        } else if(this.comments === 1) {
+        } else if (this.comments === 1) {
             this.elem.classList.add("commented");
             this.elem.classList.remove("commented_many");
         } else {
@@ -150,7 +133,7 @@ class LineElem {
     }
 
     addComment(key: string) {
-        if(this.commentKeys[key] == null) {
+        if (this.commentKeys[key] == null) {
             this.commentKeys[key] = true;
             this.comments++;
         }
@@ -158,7 +141,7 @@ class LineElem {
     }
 
     removeComment(key: string) {
-        if(this.commentKeys[key] != null) {
+        if (this.commentKeys[key] != null) {
             delete this.commentKeys[key];
             this.comments--;
         }
@@ -170,32 +153,32 @@ class LineElem {
     }
 
     private setCollapsedHeaderCss() {
-        if(this.collapsedHeader === 0)
+        if (this.collapsedHeader === 0)
             this.elem.classList.remove('collapsed_header')
         else
             this.elem.classList.add('collapsed_header')
     }
 
     setCollapsedHeader(isHeader: boolean) {
-        if(isHeader)
+        if (isHeader)
             this.collapsedHeader++;
-        else 
+        else
             this.collapsedHeader--;
 
         this.setCollapsedHeaderCss()
     }
 
     private setCollapsedCss() {
-        if(this.collapsed === 0)
+        if (this.collapsed === 0)
             this.elem.classList.remove('collapsed')
         else
             this.elem.classList.add('collapsed')
     }
 
     setCollapsed(isCollapsed: boolean) {
-        if(isCollapsed)
+        if (isCollapsed)
             this.collapsed++;
-        else 
+        else
             this.collapsed--;
 
         this.setCollapsedCss();
@@ -209,7 +192,7 @@ class LineElem {
     }
 
     setSelected(isSelected: boolean) {
-        if(isSelected) {
+        if (isSelected) {
             this.elem.classList.add("selected");
         } else {
             this.elem.classList.remove("selected");
@@ -221,11 +204,11 @@ class LineElem {
     }
 
     userSelect(selected: boolean) {
-        if(selected == this.userSelected)
+        if (selected == this.userSelected)
             return;
 
         this.userSelected = selected;
-        if(selected) {
+        if (selected) {
             this.elem.classList.add('user_selected');
         } else {
             this.elem.classList.remove('user_selected');
@@ -233,4 +216,4 @@ class LineElem {
     }
 }
 
-export {LineElem, LineClickListener, NoteAddListener};
+export { LineElem, LineClickListener, NoteAddListener };
