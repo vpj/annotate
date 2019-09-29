@@ -75,13 +75,17 @@ class SourceView {
                 lineNos.push(parseInt(lineNo));
             }
 
-            lineNos.sort();
+            lineNos.sort((x, y) => {return x - y});
             let prev: number = null;
-            for(let lineNo of lineNos) {
+
+            for(let lineNo of lineNos.slice(1)) {
                 let line = this.allLines[path][lineNo];
-                if(prev != null && prev !== lineNo - 1) {
-                    //add break
+                if(prev == null) {
+                    line.showPath();
+                } else if (prev !== lineNo - 1) {
+                    line.showBreakBefore();
                 }
+                prev = lineNo;
                 line.render(this.renderedLines.length);
                 this.renderedLines.push(line);
                 this.container.appendChild(line.elem);

@@ -27,7 +27,7 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                 _this.project.sourceView.search();
                 for (var _i = 0, selected_1 = selected; _i < selected_1.length; _i++) {
                     var note = selected_1[_i];
-                    _this.project.sourceView.selectLines(note.note.path, note.match.start - 10, note.match.end + 10);
+                    _this.project.sourceView.selectLines(note.note.path, note.match.start - 3, note.match.end + 3);
                 }
                 _this.project.sourceView.renderSelectedLines();
                 _this.removeAll();

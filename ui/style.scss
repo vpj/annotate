@@ -178,7 +178,7 @@ code {
   height: 80px;
 }
 
-.line {
+div.line {
   &:hover {
     background: rgba(0, 0, 0, 0.9) !important;
     > .add_comment {
@@ -198,6 +198,10 @@ code {
   > .has_comments_many {
     display: none;
     cursor: pointer;
+  }
+  .path {
+    margin-top: 10px;
+    text-decoration: underline;
   }
 }
 

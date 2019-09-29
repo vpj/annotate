@@ -23,11 +23,26 @@ define(["require", "exports", "./hljs", "./util"], function (require, exports, h
             this.userSelected = false;
             this.elem = null;
             this.rank = 0;
+            this.isShowBreakBefore = false;
+            this.isShowPath = false;
         }
         LineElem.prototype.render = function (rank) {
             this.rank = rank;
             this.elem = document.createElement('div');
             this.elem.className = "line";
+            if (this.isShowPath) {
+                var path = document.createElement('div');
+                path.className = "path";
+                path.textContent = this.path;
+                this.elem.appendChild(path);
+            }
+            if (this.isShowBreakBefore) {
+                var breakBefore = document.createElement('div');
+                breakBefore.textContent = '...';
+                this.elem.appendChild(breakBefore);
+            }
+            this.isShowBreakBefore = false;
+            this.isShowPath = false;
             this.addCommentIcon = util_1.createIcon('plus');
             this.addCommentIcon.classList.add('add_comment');
             this.elem.appendChild(this.addCommentIcon);
@@ -61,6 +76,12 @@ define(["require", "exports", "./hljs", "./util"], function (require, exports, h
         LineElem.prototype.remove = function () {
             this.elem.parentElement.removeChild(this.elem);
             this.elem = null;
+        };
+        LineElem.prototype.showPath = function () {
+            this.isShowPath = true;
+        };
+        LineElem.prototype.showBreakBefore = function () {
+            this.isShowBreakBefore = true;
         };
         LineElem.prototype.setCommentsCss = function () {
             if (this.comments == 0) {

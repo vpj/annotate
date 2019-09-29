@@ -31,6 +31,8 @@ class LineElem {
 
     userSelected: boolean;
     rank: number
+    isShowPath: boolean;
+    isShowBreakBefore: boolean;
 
     constructor(path: string, lineNo: number, code: string, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
         this.path = path;
@@ -48,12 +50,30 @@ class LineElem {
         this.userSelected = false;
         this.elem = null;
         this.rank = 0;
+        this.isShowBreakBefore = false;
+        this.isShowPath = false;
     }
 
     render(rank: number) {
         this.rank = rank;
         this.elem = document.createElement('div');
         this.elem.className = "line";
+        if(this.isShowPath) {
+            let path = document.createElement('div')
+            path.className = "path";
+            path.textContent = this.path;
+
+            this.elem.appendChild(path);
+        }
+        if(this.isShowBreakBefore) {
+            let breakBefore = document.createElement('div')
+            breakBefore.textContent = '...';
+
+            this.elem.appendChild(breakBefore);
+        }
+
+        this.isShowBreakBefore = false;
+        this.isShowPath = false;
 
         this.addCommentIcon = createIcon('plus');
         this.addCommentIcon.classList.add('add_comment');
@@ -98,6 +118,14 @@ class LineElem {
         this.elem = null;
     }
 
+    showPath() {
+        this.isShowPath = true;
+    }
+
+    showBreakBefore() {
+        this.isShowBreakBefore = true;
+    }
+    
     private onAddCommentClick = () => {
         this.addListener(this.path, this.lineNo, this.lineNo);
     }

@@ -150,24 +150,28 @@ code {
   width: 320px;
   height: 80px; }
 
-.line:hover {
+div.line:hover {
   background: rgba(0, 0, 0, 0.9) !important; }
-  .line:hover > .add_comment {
+  div.line:hover > .add_comment {
     visibility: visible; }
 
-.line > .add_comment {
+div.line > .add_comment {
   visibility: hidden;
   cursor: pointer;
   padding: 0 10px 0 10px;
   color: #4caf50; }
 
-.line > .has_comments {
+div.line > .has_comments {
   visibility: hidden;
   cursor: pointer; }
 
-.line > .has_comments_many {
+div.line > .has_comments_many {
   display: none;
   cursor: pointer; }
+
+div.line .path {
+  margin-top: 10px;
+  text-decoration: underline; }
 
 .line.commented_many > .has_comments {
   display: none; }

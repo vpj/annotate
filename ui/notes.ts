@@ -56,7 +56,7 @@ class Notes {
 
         for(const note of selected) {
             this.project.sourceView.selectLines(note.note.path,
-                note.match.start - 10, note.match.end + 10);
+                note.match.start - 3, note.match.end + 3);
         }
 
         this.project.sourceView.renderSelectedLines();

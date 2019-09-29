@@ -58,14 +58,18 @@ define(["require", "exports", "./line", "./util"], function (require, exports, l
                 for (var lineNo in this.selectedLines[path]) {
                     lineNos.push(parseInt(lineNo));
                 }
-                lineNos.sort();
+                lineNos.sort(function (x, y) { return x - y; });
                 var prev = null;
-                for (var _i = 0, lineNos_1 = lineNos; _i < lineNos_1.length; _i++) {
-                    var lineNo = lineNos_1[_i];
+                for (var _i = 0, _a = lineNos.slice(1); _i < _a.length; _i++) {
+                    var lineNo = _a[_i];
                     var line = this.allLines[path][lineNo];
-                    if (prev != null && prev !== lineNo - 1) {
-                        //add break
+                    if (prev == null) {
+                        line.showPath();
                     }
+                    else if (prev !== lineNo - 1) {
+                        line.showBreakBefore();
+                    }
+                    prev = lineNo;
                     line.render(this.renderedLines.length);
                     this.renderedLines.push(line);
                     this.container.appendChild(line.elem);
