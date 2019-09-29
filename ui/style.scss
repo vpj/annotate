@@ -360,8 +360,11 @@ div.note > div.view {
     margin-left: -10px;
   }
 
-  div.label > i {
-    margin-right: 5px;
+  div.label {
+    white-space: nowrap;
+    > i {
+      margin-right: 5px;
+    }
   }
 
   div.file {

@@ -14,19 +14,19 @@ define(["require", "exports", "./line", "./util", "./hljs"], function (require, 
             var _this = this;
             this.container.addEventListener('mousedown', function (ev) {
                 // console.log('down', ev.pageX, ev.pageY, ev);
-                _this.onUserSelect(ev.pageX, ev.pageY, 'start');
+                _this.onUserSelect(ev.clientX, ev.clientY, 'start');
             });
             this.container.addEventListener('mousemove', function (ev) {
                 // console.log('move', ev.pageX, ev.pageY, ev);
-                _this.onUserSelect(ev.pageX, ev.pageY, 'move');
+                _this.onUserSelect(ev.clientX, ev.clientY, 'move');
             });
             this.container.addEventListener('mouseup', function (ev) {
                 // console.log('up', ev.pageX, ev.pageY, ev);
-                _this.onUserSelect(ev.pageX, ev.pageY, 'end');
+                _this.onUserSelect(ev.clientX, ev.clientY, 'end');
             });
             this.container.addEventListener('mouseleave', function (ev) {
                 // console.log('leave', ev.pageX, ev.pageY, ev);
-                _this.onUserSelect(ev.pageX, ev.pageY, 'leave');
+                _this.onUserSelect(ev.clientX, ev.clientY, 'leave');
             });
         };
         SourceView.prototype.removeAll = function () {

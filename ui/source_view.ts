@@ -25,19 +25,19 @@ class SourceView {
     private setEvents() {
         this.container.addEventListener('mousedown', (ev) => {
             // console.log('down', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.pageX, ev.pageY, 'start');
+            this.onUserSelect(ev.clientX, ev.clientY, 'start');
         });
         this.container.addEventListener('mousemove', (ev) => {
             // console.log('move', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.pageX, ev.pageY, 'move');
+            this.onUserSelect(ev.clientX, ev.clientY, 'move');
         });
         this.container.addEventListener('mouseup', (ev) => {
             // console.log('up', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.pageX, ev.pageY, 'end');
+            this.onUserSelect(ev.clientX, ev.clientY, 'end');
         });
         this.container.addEventListener('mouseleave', (ev) => {
             // console.log('leave', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.pageX, ev.pageY, 'leave');
+            this.onUserSelect(ev.clientX, ev.clientY, 'leave');
         });
     }
 
