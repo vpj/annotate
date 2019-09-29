@@ -23,5 +23,14 @@ and for collaboration.
 
 Run `server/ann.py` from the folder with your python source code.
 
-Go to `localhost:8888/static/index.html`
+Visit `localhost:8888` in the browser.
+
+## Roadmap
+◻️  Use the urls so that we can use browsers back/forward functions and history
+
+◻️  Click search results to open file
+
+◻️  Search code
+
+◻️  Use Weya for rendering
 
