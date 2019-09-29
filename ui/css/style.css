@@ -170,6 +170,7 @@ div.line > .has_comments_many {
   cursor: pointer; }
 
 div.line .path {
+  cursor: pointer;
   margin-top: 10px;
   text-decoration: underline; }
 

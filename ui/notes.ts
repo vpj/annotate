@@ -8,7 +8,6 @@ const MARGIN_OTHER = 5;
 
 class Notes {
     notes: {[path: string]: {[key: string]: NoteElem}};
-    project: Project;
     container: HTMLElement;
     notesCount: number;
     selected?: NoteElem;
@@ -21,7 +20,6 @@ class Notes {
         this.notes = {};
         this.notesCount = 0;
         this.container = container;
-        this.project = project;
         this.selected = null;
         this.selectedFile = null;
         this.renderedNotes = [];
@@ -50,14 +48,14 @@ class Notes {
             }
         }
 
-        this.project.sourceView.search();
+        Project.instance().sourceView.search();
 
         for(const note of selected) {
-            this.project.sourceView.selectLines(note.note.path,
+            Project.instance().sourceView.selectLines(note.note.path,
                 note.match.start - 3, note.match.end + 3);
         }
 
-        this.project.sourceView.renderSelectedLines();
+        Project.instance().sourceView.renderSelectedLines();
 
         this.removeAll();
         for(const note of selected) {
@@ -72,10 +70,10 @@ class Notes {
         const match = note.match;
         const path = note.note.path;
 
-        let rank = this.project.sourceView.getRenderedLineRank(path, match.start);
+        let rank = Project.instance().sourceView.getRenderedLineRank(path, match.start);
         for(let i = 0; i < this.renderedNotes.length; ++i) {
             let n = this.renderedNotes[i];
-            let r = this.project.sourceView.getRenderedLineRank(n.note.path, n.match.start);
+            let r = Project.instance().sourceView.getRenderedLineRank(n.note.path, n.match.start);
 
             if(r > rank) {
                 nextNoteIdx = i;
@@ -97,19 +95,19 @@ class Notes {
             return;
         }
         for(let i = match.start; i <= match.start; ++i) {
-            this.project.sourceView.addComment(path, i, note.key);
+            Project.instance().sourceView.addComment(path, i, note.key);
         }
 
         if(note.note.codeCollapsed) {
-            this.project.sourceView.setCollapsedHeader(path, match.start, true);
+            Project.instance().sourceView.setCollapsedHeader(path, match.start, true);
             for(let i = match.start + 1; i <= match.end; ++i) {
-                this.project.sourceView.setCollapsed(path, i, true);
+                Project.instance().sourceView.setCollapsed(path, i, true);
             }    
         }
     }
 
     private addNote(note: Note): NoteElem {
-        let match = this.project.sourceMatcher.match(note);
+        let match = Project.instance().sourceMatcher.match(note);
         let key = `${this.notesCount}`;
         let elem = new NoteElem(key, note, match, 
             this.onNoteClick,
@@ -167,7 +165,7 @@ class Notes {
             let y = note.elem.getBoundingClientRect().top;
             let lineNo = this.select(path, key);
             if(lineNo != null) {
-                this.project.sourceView.scroll(path, lineNo, y);
+                Project.instance().sourceView.scroll(path, lineNo, y);
             }
         }
     }
@@ -178,16 +176,16 @@ class Notes {
         let post: string[] = [];
 
         for(let i = -PADDING; i < 0; ++i) {
-            let line = this.project.sourceView.getCode(path, start + i);
+            let line = Project.instance().sourceView.getCode(path, start + i);
             if(line != null) {
                 pre.push(line.code);
             }
         }
         for(let i = start; i <= end; ++i) {
-            code.push(this.project.sourceView.getCode(path, i).code);
+            code.push(Project.instance().sourceView.getCode(path, i).code);
         }
         for(let i = 1; i <= PADDING; ++i) {
-            let line = this.project.sourceView.getCode(path, end + i);
+            let line = Project.instance().sourceView.getCode(path, end + i);
             if(line != null) {
                 post.push(line.code);
             }
@@ -213,25 +211,25 @@ class Notes {
             }
         }
 
-        this.project.updateNotes(note.note.path, this.toJSON())
+        Project.instance().updateNotes(note.note.path, this.toJSON())
     }
 
     private onCollapseCode = (path: string, key: string) => {
         let note = this.notes[path][key];
         let match = note.match;
         if(note.note.codeCollapsed) {
-            this.project.sourceView.setCollapsedHeader(note.note.path, match.start, true);
+            Project.instance().sourceView.setCollapsedHeader(note.note.path, match.start, true);
             for(let i = match.start + 1; i <= match.end; ++i) {
-                this.project.sourceView.setCollapsed(note.note.path, i, true);
+                Project.instance().sourceView.setCollapsed(note.note.path, i, true);
             }    
         } else {
-            this.project.sourceView.setCollapsedHeader(note.note.path, match.start, false);
+            Project.instance().sourceView.setCollapsedHeader(note.note.path, match.start, false);
             for(let i = match.start + 1; i <= match.end; ++i) {
-                this.project.sourceView.setCollapsed(note.note.path, i, false);
+                Project.instance().sourceView.setCollapsed(note.note.path, i, false);
             }    
         }
 
-        this.project.updateNotes(note.note.path, this.toJSON())
+        Project.instance().updateNotes(note.note.path, this.toJSON())
     }
 
     remove(note: NoteElem) {
@@ -255,13 +253,13 @@ class Notes {
         }
         
         for(let i = match.start; i <= match.start; ++i) {
-            this.project.sourceView.removeComment(path, i, note.key);
+            Project.instance().sourceView.removeComment(path, i, note.key);
         }
 
         if(note.note.codeCollapsed) {
-            this.project.sourceView.setCollapsedHeader(path, match.start, false);
+            Project.instance().sourceView.setCollapsedHeader(path, match.start, false);
             for(let i = match.start + 1; i <= match.end; ++i) {
-                this.project.sourceView.setCollapsed(path, i, false);
+                Project.instance().sourceView.setCollapsed(path, i, false);
             }    
         }
     }
@@ -273,7 +271,7 @@ class Notes {
     }
 
     moveToLine(path: string, lineNo: number) {
-        for(let k in this.project.sourceView.getCommentKeys(path, lineNo)) {
+        for(let k in Project.instance().sourceView.getCommentKeys(path, lineNo)) {
             this.select(path, k);
             break;
         }
@@ -284,7 +282,7 @@ class Notes {
             let oldNote = this.notes[this.selected.note.path][this.selected.key];
             oldNote.unselect();
             for(let i = oldNote.match.start; i <= oldNote.match.end; ++i) {
-                this.project.sourceView.setSelected(this.selected.note.path, i, false);
+                Project.instance().sourceView.setSelected(this.selected.note.path, i, false);
             }
             this.selected = null;
             if(oldNote.note.note.trim() == '') {
@@ -299,7 +297,7 @@ class Notes {
         let note = this.notes[path][key];
         note.select();
         for(let i = note.match.start; i <= note.match.end; ++i) {
-            this.project.sourceView.setSelected(path, i, true);
+            Project.instance().sourceView.setSelected(path, i, true);
         }
         this.selected = note;
         let start = note.match.start;
@@ -310,7 +308,7 @@ class Notes {
         }
 
         window.requestAnimationFrame(() => {
-            let y = this.project.sourceView.getY(path, start);
+            let y = Project.instance().sourceView.getY(path, start);
             let yn = note.getY();
 
             let transform = y - yn;

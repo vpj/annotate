@@ -28,7 +28,7 @@ Visit `localhost:8888` in the browser.
 ## Roadmap
 ◻️  Use the urls so that we can use browsers back/forward functions and history
 
-◻️  Click search results to open file
+✅ Click search results to open file
 
 ◻️  Search code
 

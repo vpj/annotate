@@ -15,8 +15,9 @@ class Project {
     notes: Notes
     files: Files
     selected_file: string
+    private static _instance: Project = null;
 
-    constructor() {
+    private constructor() {
         this.sourceMatcher = new SourceCodeMatcher();
         this.sourceView = new SourceView(document.getElementById('source_code'),
             this.onCodeClick,
@@ -26,6 +27,14 @@ class Project {
             this.onFileClick);
     }
 
+    static instance() {
+        if(Project._instance == null) {
+            Project._instance = new Project();
+        }
+
+        return Project._instance;
+    }
+    
     selectFile(path: string) {
         this.selected_file = path;
         this.sourceView.selectFile(path);

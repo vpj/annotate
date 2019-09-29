@@ -1,4 +1,4 @@
-define(["require", "exports", "./note", "./note_elem"], function (require, exports, note_1, note_elem_1) {
+define(["require", "exports", "./note", "./note_elem", "./project"], function (require, exports, note_1, note_elem_1, project_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PADDING = 5;
@@ -24,12 +24,12 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                         }
                     }
                 }
-                _this.project.sourceView.search();
+                project_1.Project.instance().sourceView.search();
                 for (var _i = 0, selected_1 = selected; _i < selected_1.length; _i++) {
                     var note = selected_1[_i];
-                    _this.project.sourceView.selectLines(note.note.path, note.match.start - 3, note.match.end + 3);
+                    project_1.Project.instance().sourceView.selectLines(note.note.path, note.match.start - 3, note.match.end + 3);
                 }
-                _this.project.sourceView.renderSelectedLines();
+                project_1.Project.instance().sourceView.renderSelectedLines();
                 _this.removeAll();
                 for (var _a = 0, selected_2 = selected; _a < selected_2.length; _a++) {
                     var note = selected_2[_a];
@@ -45,7 +45,7 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                     var y = note.elem.getBoundingClientRect().top;
                     var lineNo = _this.select(path, key);
                     if (lineNo != null) {
-                        _this.project.sourceView.scroll(path, lineNo, y);
+                        project_1.Project.instance().sourceView.scroll(path, lineNo, y);
                     }
                 }
             };
@@ -60,29 +60,28 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                         _this.select(newNote.note.path, newNote.key);
                     }
                 }
-                _this.project.updateNotes(note.note.path, _this.toJSON());
+                project_1.Project.instance().updateNotes(note.note.path, _this.toJSON());
             };
             this.onCollapseCode = function (path, key) {
                 var note = _this.notes[path][key];
                 var match = note.match;
                 if (note.note.codeCollapsed) {
-                    _this.project.sourceView.setCollapsedHeader(note.note.path, match.start, true);
+                    project_1.Project.instance().sourceView.setCollapsedHeader(note.note.path, match.start, true);
                     for (var i = match.start + 1; i <= match.end; ++i) {
-                        _this.project.sourceView.setCollapsed(note.note.path, i, true);
+                        project_1.Project.instance().sourceView.setCollapsed(note.note.path, i, true);
                     }
                 }
                 else {
-                    _this.project.sourceView.setCollapsedHeader(note.note.path, match.start, false);
+                    project_1.Project.instance().sourceView.setCollapsedHeader(note.note.path, match.start, false);
                     for (var i = match.start + 1; i <= match.end; ++i) {
-                        _this.project.sourceView.setCollapsed(note.note.path, i, false);
+                        project_1.Project.instance().sourceView.setCollapsed(note.note.path, i, false);
                     }
                 }
-                _this.project.updateNotes(note.note.path, _this.toJSON());
+                project_1.Project.instance().updateNotes(note.note.path, _this.toJSON());
             };
             this.notes = {};
             this.notesCount = 0;
             this.container = container;
-            this.project = project;
             this.selected = null;
             this.selectedFile = null;
             this.renderedNotes = [];
@@ -96,10 +95,10 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
             var nextNoteIdx = null;
             var match = note.match;
             var path = note.note.path;
-            var rank = this.project.sourceView.getRenderedLineRank(path, match.start);
+            var rank = project_1.Project.instance().sourceView.getRenderedLineRank(path, match.start);
             for (var i = 0; i < this.renderedNotes.length; ++i) {
                 var n = this.renderedNotes[i];
-                var r = this.project.sourceView.getRenderedLineRank(n.note.path, n.match.start);
+                var r = project_1.Project.instance().sourceView.getRenderedLineRank(n.note.path, n.match.start);
                 if (r > rank) {
                     nextNoteIdx = i;
                     break;
@@ -118,17 +117,17 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                 return;
             }
             for (var i = match.start; i <= match.start; ++i) {
-                this.project.sourceView.addComment(path, i, note.key);
+                project_1.Project.instance().sourceView.addComment(path, i, note.key);
             }
             if (note.note.codeCollapsed) {
-                this.project.sourceView.setCollapsedHeader(path, match.start, true);
+                project_1.Project.instance().sourceView.setCollapsedHeader(path, match.start, true);
                 for (var i = match.start + 1; i <= match.end; ++i) {
-                    this.project.sourceView.setCollapsed(path, i, true);
+                    project_1.Project.instance().sourceView.setCollapsed(path, i, true);
                 }
             }
         };
         Notes.prototype.addNote = function (note) {
-            var match = this.project.sourceMatcher.match(note);
+            var match = project_1.Project.instance().sourceMatcher.match(note);
             var key = "" + this.notesCount;
             var elem = new note_elem_1.NoteElem(key, note, match, this.onNoteClick, this.onUpdate, this.onCollapseCode);
             this.notesCount++;
@@ -173,16 +172,16 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
             var code = [];
             var post = [];
             for (var i = -PADDING; i < 0; ++i) {
-                var line = this.project.sourceView.getCode(path, start + i);
+                var line = project_1.Project.instance().sourceView.getCode(path, start + i);
                 if (line != null) {
                     pre.push(line.code);
                 }
             }
             for (var i = start; i <= end; ++i) {
-                code.push(this.project.sourceView.getCode(path, i).code);
+                code.push(project_1.Project.instance().sourceView.getCode(path, i).code);
             }
             for (var i = 1; i <= PADDING; ++i) {
-                var line = this.project.sourceView.getCode(path, end + i);
+                var line = project_1.Project.instance().sourceView.getCode(path, end + i);
                 if (line != null) {
                     post.push(line.code);
                 }
@@ -210,12 +209,12 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                 return;
             }
             for (var i = match.start; i <= match.start; ++i) {
-                this.project.sourceView.removeComment(path, i, note.key);
+                project_1.Project.instance().sourceView.removeComment(path, i, note.key);
             }
             if (note.note.codeCollapsed) {
-                this.project.sourceView.setCollapsedHeader(path, match.start, false);
+                project_1.Project.instance().sourceView.setCollapsedHeader(path, match.start, false);
                 for (var i = match.start + 1; i <= match.end; ++i) {
-                    this.project.sourceView.setCollapsed(path, i, false);
+                    project_1.Project.instance().sourceView.setCollapsed(path, i, false);
                 }
             }
         };
@@ -225,7 +224,7 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
             noteElem.edit();
         };
         Notes.prototype.moveToLine = function (path, lineNo) {
-            for (var k in this.project.sourceView.getCommentKeys(path, lineNo)) {
+            for (var k in project_1.Project.instance().sourceView.getCommentKeys(path, lineNo)) {
                 this.select(path, k);
                 break;
             }
@@ -235,7 +234,7 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                 var oldNote = this.notes[this.selected.note.path][this.selected.key];
                 oldNote.unselect();
                 for (var i = oldNote.match.start; i <= oldNote.match.end; ++i) {
-                    this.project.sourceView.setSelected(this.selected.note.path, i, false);
+                    project_1.Project.instance().sourceView.setSelected(this.selected.note.path, i, false);
                 }
                 this.selected = null;
                 if (oldNote.note.note.trim() == '') {
@@ -249,7 +248,7 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
             var note = this.notes[path][key];
             note.select();
             for (var i = note.match.start; i <= note.match.end; ++i) {
-                this.project.sourceView.setSelected(path, i, true);
+                project_1.Project.instance().sourceView.setSelected(path, i, true);
             }
             this.selected = note;
             var start = note.match.start;
@@ -258,7 +257,7 @@ define(["require", "exports", "./note", "./note_elem"], function (require, expor
                 return null;
             }
             window.requestAnimationFrame(function () {
-                var y = _this.project.sourceView.getY(path, start);
+                var y = project_1.Project.instance().sourceView.getY(path, start);
                 var yn = note.getY();
                 var transform = y - yn;
                 if (isFirst)

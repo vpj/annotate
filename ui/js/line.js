@@ -1,9 +1,12 @@
-define(["require", "exports", "./hljs", "./weya"], function (require, exports, hljs_1, weya_1) {
+define(["require", "exports", "./hljs", "./weya", "./project"], function (require, exports, hljs_1, weya_1, project_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var LineElem = /** @class */ (function () {
         function LineElem(path, lineNo, code, language, clickListener, addListener) {
             var _this = this;
+            this.onSelectFile = function () {
+                project_1.Project.instance().selectFile(_this.path);
+            };
             this.onAddCommentClick = function () {
                 _this.addListener(_this.path, _this.lineNo, _this.lineNo);
             };
@@ -32,7 +35,7 @@ define(["require", "exports", "./hljs", "./weya"], function (require, exports, h
             this.rank = rank;
             this.elem = weya_1.Weya('div.line', function ($) {
                 if (_this.isShowPath) {
-                    $('div.path', _this.path);
+                    $('div.path', _this.path, { on: { 'click': _this.onSelectFile } });
                 }
                 if (_this.isShowBreakBefore) {
                     $('div', '...');

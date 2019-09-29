@@ -1,6 +1,7 @@
 import { highlight } from "./hljs"
 import { createIcon } from "./util";
 import { Weya as $, WeyaElement } from "./weya";
+import { Project } from "./project";
 
 interface LineClickListener {
     (path: string, lineNo: number): void
@@ -61,7 +62,7 @@ class LineElem {
         this.rank = rank;
         this.elem = <HTMLDivElement>$('div.line', $ => {
             if (this.isShowPath) {
-                $('div.path', this.path);
+                $('div.path', this.path, {on: {'click': this.onSelectFile}});
             }
             if (this.isShowBreakBefore) {
                 $('div', '...');
@@ -92,6 +93,10 @@ class LineElem {
         this.setCommentsCss();
         this.setCollapsedCss();
         this.setCollapsedHeaderCss();
+    }
+
+    onSelectFile = () => {
+        Project.instance().selectFile(this.path);
     }
 
     isRendered() {

@@ -18,6 +18,12 @@ define(["require", "exports", "./api", "./source_view", "./source_code", "./note
             this.notes = new notes_1.Notes(document.getElementById("notes"), this);
             this.files = new files_1.Files(document.getElementById("files"), this.onFileClick);
         }
+        Project.instance = function () {
+            if (Project._instance == null) {
+                Project._instance = new Project();
+            }
+            return Project._instance;
+        };
         Project.prototype.selectFile = function (path) {
             this.selected_file = path;
             this.sourceView.selectFile(path);
@@ -59,6 +65,7 @@ define(["require", "exports", "./api", "./source_view", "./source_code", "./note
                 window.status = "Saved";
             });
         };
+        Project._instance = null;
         return Project;
     }());
     exports.Project = Project;
