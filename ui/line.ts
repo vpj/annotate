@@ -33,6 +33,7 @@ class LineElem {
     rank: number
     isShowPath: boolean;
     isShowBreakBefore: boolean;
+    commentKeys: {[key: string]: boolean};
 
     constructor(path: string, lineNo: number, code: string, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
         this.path = path;
@@ -52,6 +53,7 @@ class LineElem {
         this.rank = 0;
         this.isShowBreakBefore = false;
         this.isShowPath = false;
+        this.commentKeys = {};
     }
 
     render(rank: number) {
@@ -147,14 +149,24 @@ class LineElem {
         }
     }
 
-    addComment() {
-        this.comments++;
+    addComment(key: string) {
+        if(this.commentKeys[key] == null) {
+            this.commentKeys[key] = true;
+            this.comments++;
+        }
         this.setCommentsCss();
     }
 
-    removeComment() {
-        this.comments--;
+    removeComment(key: string) {
+        if(this.commentKeys[key] != null) {
+            delete this.commentKeys[key];
+            this.comments--;
+        }
         this.setCommentsCss();
+    }
+
+    getCommentKeys() {
+        return this.commentKeys;
     }
 
     private setCollapsedHeaderCss() {

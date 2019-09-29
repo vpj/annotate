@@ -196,12 +196,16 @@ class SourceView {
         this.markUserSelection();
     }
 
-    addComment(path: string, lineNo: number) {
-        this.allLines[path][lineNo].addComment();
+    addComment(path: string, lineNo: number, key: string) {
+        this.allLines[path][lineNo].addComment(key);
     }
 
-    removeComment(path: string, lineNo: number) {
-        this.allLines[path][lineNo].removeComment();
+    removeComment(path: string, lineNo: number, key: string) {
+        this.allLines[path][lineNo].removeComment(key);
+    }
+
+    getCommentKeys(path: string, lineNo: number): {[key: string]: boolean} {
+        return this.allLines[path][lineNo].getCommentKeys();
     }
 
     setCollapsedHeader(path: string, lineNo: number, isHeader: boolean) {

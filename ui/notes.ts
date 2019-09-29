@@ -11,7 +11,6 @@ class Notes {
     project: Project;
     container: HTMLElement;
     notesCount: number;
-    lineToNote: {[path: string]: {[lineNo: number]: {[key: string]: boolean}}};
     selected?: NoteElem;
     selectedFile?: string;
     renderedNotes: NoteElem[];
@@ -23,7 +22,6 @@ class Notes {
         this.notesCount = 0;
         this.container = container;
         this.project = project;
-        this.lineToNote = {};
         this.selected = null;
         this.selectedFile = null;
         this.renderedNotes = [];
@@ -95,19 +93,11 @@ class Notes {
             this.renderedNotes.splice(nextNoteIdx, 0, note);
         }
 
-        if(!(path in this.lineToNote)) {
-            this.lineToNote[path] = {};
-        }
-
         if(match.start > match.end) {
             return;
         }
         for(let i = match.start; i <= match.start; ++i) {
-            if(!(i in this.lineToNote)) {
-                this.lineToNote[path][i] = {};
-            }
-            this.lineToNote[path][i][note.key] = true;
-            this.project.sourceView.addComment(path, i);
+            this.project.sourceView.addComment(path, i, note.key);
         }
 
         if(note.note.codeCollapsed) {
@@ -138,7 +128,6 @@ class Notes {
     load(notes: {[path: string]: {[key: string]: any}[]}) {
         this.notes = {};
         this.notesCount = 0;
-        this.lineToNote = {};
         this.selected = null;
         this.container.innerHTML = '';
 
@@ -266,8 +255,7 @@ class Notes {
         }
         
         for(let i = match.start; i <= match.start; ++i) {
-            delete this.lineToNote[path][i][note.key];
-            this.project.sourceView.removeComment(path, i);
+            this.project.sourceView.removeComment(path, i, note.key);
         }
 
         if(note.note.codeCollapsed) {
@@ -285,7 +273,7 @@ class Notes {
     }
 
     moveToLine(path: string, lineNo: number) {
-        for(let k in this.lineToNote[path][lineNo]) {
+        for(let k in this.project.sourceView.getCommentKeys(path, lineNo)) {
             this.select(path, k);
             break;
         }

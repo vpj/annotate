@@ -25,6 +25,7 @@ define(["require", "exports", "./hljs", "./util"], function (require, exports, h
             this.rank = 0;
             this.isShowBreakBefore = false;
             this.isShowPath = false;
+            this.commentKeys = {};
         }
         LineElem.prototype.render = function (rank) {
             this.rank = rank;
@@ -96,13 +97,22 @@ define(["require", "exports", "./hljs", "./util"], function (require, exports, h
                 this.elem.classList.add("commented_many");
             }
         };
-        LineElem.prototype.addComment = function () {
-            this.comments++;
+        LineElem.prototype.addComment = function (key) {
+            if (this.commentKeys[key] == null) {
+                this.commentKeys[key] = true;
+                this.comments++;
+            }
             this.setCommentsCss();
         };
-        LineElem.prototype.removeComment = function () {
-            this.comments--;
+        LineElem.prototype.removeComment = function (key) {
+            if (this.commentKeys[key] != null) {
+                delete this.commentKeys[key];
+                this.comments--;
+            }
             this.setCommentsCss();
+        };
+        LineElem.prototype.getCommentKeys = function () {
+            return this.commentKeys;
         };
         LineElem.prototype.setCollapsedHeaderCss = function () {
             if (this.collapsedHeader === 0)

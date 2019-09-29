@@ -163,11 +163,14 @@ define(["require", "exports", "./line", "./util"], function (require, exports, l
             this.userSelection = null;
             this.markUserSelection();
         };
-        SourceView.prototype.addComment = function (path, lineNo) {
-            this.allLines[path][lineNo].addComment();
+        SourceView.prototype.addComment = function (path, lineNo, key) {
+            this.allLines[path][lineNo].addComment(key);
         };
-        SourceView.prototype.removeComment = function (path, lineNo) {
-            this.allLines[path][lineNo].removeComment();
+        SourceView.prototype.removeComment = function (path, lineNo, key) {
+            this.allLines[path][lineNo].removeComment(key);
+        };
+        SourceView.prototype.getCommentKeys = function (path, lineNo) {
+            return this.allLines[path][lineNo].getCommentKeys();
         };
         SourceView.prototype.setCollapsedHeader = function (path, lineNo, isHeader) {
             this.allLines[path][lineNo].setCollapsedHeader(isHeader);
