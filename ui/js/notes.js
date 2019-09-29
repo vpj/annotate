@@ -5,7 +5,7 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
     var MARGIN_FIRST = 30;
     var MARGIN_OTHER = 5;
     var Notes = /** @class */ (function () {
-        function Notes(container, project) {
+        function Notes(container) {
             var _this = this;
             this.onSearch = function () {
                 var search = _this.notesSearch.value;

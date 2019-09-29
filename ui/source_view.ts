@@ -1,15 +1,16 @@
-import {LineElem, LineClickListener, NoteAddListener} from "./line"
+import { LineElem, LineClickListener, NoteAddListener } from "./line"
 import { getLanguage } from "./util";
+import { highlight } from "./hljs"
 
 class SourceView {
     renderedLines: LineElem[]
-    allLines: {[path: string]: LineElem[]}
+    allLines: { [path: string]: LineElem[] }
     selectedFile: string
     lineClickListener: LineClickListener;
     noteAddListener: NoteAddListener;
     container: HTMLElement;
     userSelection?: any
-    selectedLines: {[path: string]: {[lineNo: number]: boolean}};
+    selectedLines: { [path: string]: { [lineNo: number]: boolean } };
 
     constructor(container: HTMLElement, lineClickListener: LineClickListener, noteAddListener: NoteAddListener) {
         this.allLines = {};
@@ -41,7 +42,7 @@ class SourceView {
     }
 
     private removeAll() {
-        for(let line of this.renderedLines) {
+        for (let line of this.renderedLines) {
             line.remove();
         }
         this.renderedLines = [];
@@ -59,28 +60,28 @@ class SourceView {
         start = Math.max(0, start);
         end = Math.min(lines.length - 1, end);
 
-        if(this.selectedLines[path] == null) {
+        if (this.selectedLines[path] == null) {
             this.selectedLines[path] = {};
 
-        } 
-        for(let i = start; i < end; ++i) {
+        }
+        for (let i = start; i < end; ++i) {
             this.selectedLines[path][i] = true;
         }
     }
 
     renderSelectedLines() {
-        for(let path in this.selectedLines) {
+        for (let path in this.selectedLines) {
             let lineNos: number[] = [];
-            for(let lineNo in this.selectedLines[path]) {
+            for (let lineNo in this.selectedLines[path]) {
                 lineNos.push(parseInt(lineNo));
             }
 
-            lineNos.sort((x, y) => {return x - y});
+            lineNos.sort((x, y) => { return x - y });
             let prev: number = null;
 
-            for(let lineNo of lineNos.slice(1)) {
+            for (let lineNo of lineNos.slice(1)) {
                 let line = this.allLines[path][lineNo];
-                if(prev == null) {
+                if (prev == null) {
                     line.showPath();
                 } else if (prev !== lineNo - 1) {
                     line.showBreakBefore();
@@ -98,7 +99,7 @@ class SourceView {
         this.removeAll();
         let lines = this.allLines[path];
 
-        for(let i = 0; i < lines.length; ++i) {
+        for (let i = 0; i < lines.length; ++i) {
             const elem = lines[i];
             elem.render(i);
             this.renderedLines.push(elem);
@@ -106,26 +107,68 @@ class SourceView {
         }
     }
 
-    load(files: {[path: string]: string[]}) {
-        for(let path in files) {
+    load(files: { [path: string]: string[] }) {
+        for (let path in files) {
             const lines = files[path];
             this.allLines[path] = [];
             const language = getLanguage(path);
-            for(let i = 0; i < lines.length; ++i) {
-                let elem = new LineElem(path, i, lines[i], language, 
+            let h = highlight(language, lines.join("\n"), true, null);
+            let highlightedLines: string[] = h.value.split('\n');
+            if (lines.length === 0) {
+                highlightedLines = [];
+            }
+            if (highlightedLines.length !== lines.length) {
+                throw Error("Highlighting Error");
+            }
+
+            let spans = [];
+            for (let i = 0; i < lines.length; ++i) {
+                let h = highlightedLines[i];
+                let hu = spans.join('') + h;
+                let ends = [];
+                for (let j = 0; j < spans.length; ++j) {
+                    ends.push('</span>');
+                }
+                hu += ends.join('');
+
+                let elem = new LineElem(path, i, lines[i], hu,
+                    language,
                     this.lineClickListener,
                     this.noteAddListener);
+
+                let p = 0;
+                for (let j = 0; true; ++j) {
+                    p = h.indexOf('<span', p);
+                    if (p === -1) {
+                        break;
+                    }
+
+                    let e = h.indexOf('>');
+                    spans.push(h.slice(p, e + 1));
+                    p++;
+                }
+                p = 0;
+                for (let j = 0; true; ++j) {
+                    p = h.indexOf('</span', p);
+                    if (p === -1) {
+                        break;
+                    }
+
+                    spans.pop();
+                    p++;
+                }
+
                 this.allLines[path].push(elem);
-            }    
+            }
         }
     }
-    
+
     getRenderedLineRank(path: string, lineNo: number): number {
         return this.allLines[path][lineNo].rank;
     }
 
     onUserSelect(x: number, y: number, event: string) {
-        if(this.renderedLines.length == 0) 
+        if (this.renderedLines.length == 0)
             return;
 
         x -= this.container.getBoundingClientRect().left;
@@ -137,14 +180,14 @@ class SourceView {
 
         let height = line.elem.getBoundingClientRect().height;
         let margin = line.codeElem.getBoundingClientRect().left -
-                     this.container.getBoundingClientRect().left;
+            this.container.getBoundingClientRect().left;
 
         // console.log(height, margin);
 
         let lineNo = Math.floor(y / height);
 
-        if(event == 'start') {
-            if(x >= margin) {
+        if (event == 'start') {
+            if (x >= margin) {
                 this.clearUserSelection();
                 return;
             }
@@ -155,21 +198,21 @@ class SourceView {
             };
 
             this.markUserSelection();
-        } else if(event == 'move') {
-            if(this.userSelection == null)
+        } else if (event == 'move') {
+            if (this.userSelection == null)
                 return;
             this.userSelection.end = lineNo;
             this.markUserSelection();
-        } else if(event == 'leave') {
-            if(this.userSelection == null)
+        } else if (event == 'leave') {
+            if (this.userSelection == null)
                 return;
             this.clearUserSelection();
         } else {
-            if(this.userSelection == null)
+            if (this.userSelection == null)
                 return;
             let f = Math.min(this.userSelection.start, this.userSelection.end);
             let t = Math.max(this.userSelection.start, this.userSelection.end);
-            if(f != t) {
+            if (f != t) {
                 this.noteAddListener(this.selectedFile, f, t)
             }
             this.clearUserSelection();
@@ -177,16 +220,16 @@ class SourceView {
     }
 
     markUserSelection() {
-        for(let l of this.renderedLines) {
+        for (let l of this.renderedLines) {
             l.userSelect(false);
         }
 
-        if(this.userSelection == null)
+        if (this.userSelection == null)
             return;
 
         let f = Math.min(this.userSelection.start, this.userSelection.end);
         let t = Math.max(this.userSelection.start, this.userSelection.end);
-        for(let i = f; i <= t; ++i) {
+        for (let i = f; i <= t; ++i) {
             this.renderedLines[i].userSelect(true);
         }
     }
@@ -204,7 +247,7 @@ class SourceView {
         this.allLines[path][lineNo].removeComment(key);
     }
 
-    getCommentKeys(path: string, lineNo: number): {[key: string]: boolean} {
+    getCommentKeys(path: string, lineNo: number): { [key: string]: boolean } {
         return this.allLines[path][lineNo].getCommentKeys();
     }
 
@@ -226,13 +269,13 @@ class SourceView {
 
     scroll(path: string, lineNo: number, offset: number) {
         const line = this.allLines[path][lineNo];
-        if(!line.isRendered()) {
+        if (!line.isRendered()) {
             return;
         }
 
         let node = this.container;
         let containerOffset = 0;
-        while(node != null) {
+        while (node != null) {
             containerOffset += node.offsetTop;
             node = node.parentElement;
         }
@@ -242,7 +285,7 @@ class SourceView {
     getCode(path: string, lineNo: number) {
         let lines = this.allLines[path];
 
-        if(lineNo < 0 || lineNo >= lines.length) {
+        if (lineNo < 0 || lineNo >= lines.length) {
             return null;
         }
 
@@ -251,4 +294,4 @@ class SourceView {
 }
 
 
-export {SourceView}
+export { SourceView }

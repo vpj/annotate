@@ -19,7 +19,7 @@ class Note {
     //         this.note = note;
     // }
 
-    constructor(path, opt: {[key: string]: any}) {
+    constructor(path, opt: { [key: string]: any }) {
         this.path = path;
         this.pre = opt['pre'];
         this.post = opt['post'];
@@ -46,21 +46,21 @@ class Note {
         code: string[],
         note: string,
         opt: {}) {
-            let n = {
-                'pre': pre,
-                'post': post,
-                'code': code,
-                'note': note
-            };
-            for(let k in opt) {
-                if(!(k in n)) {
-                    n[k] = opt[k];
-                }
+        let n = {
+            'pre': pre,
+            'post': post,
+            'code': code,
+            'note': note
+        };
+        for (let k in opt) {
+            if (!(k in n)) {
+                n[k] = opt[k];
             }
+        }
 
-            return new Note(path, n);
+        return new Note(path, n);
     }
 }
 
 
-export {Note};
+export { Note };

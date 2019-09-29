@@ -15,7 +15,7 @@ define(["require", "exports", "./api", "./source_view", "./source_code", "./note
             };
             this.sourceMatcher = new source_code_1.SourceCodeMatcher();
             this.sourceView = new source_view_1.SourceView(document.getElementById('source_code'), this.onCodeClick, this.onNoteAdd);
-            this.notes = new notes_1.Notes(document.getElementById("notes"), this);
+            this.notes = new notes_1.Notes(document.getElementById("notes"));
             this.files = new files_1.Files(document.getElementById("files"), this.onFileClick);
         }
         Project.instance = function () {

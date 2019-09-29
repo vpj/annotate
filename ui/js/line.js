@@ -1,8 +1,8 @@
-define(["require", "exports", "./hljs", "./weya", "./project"], function (require, exports, hljs_1, weya_1, project_1) {
+define(["require", "exports", "./weya", "./project"], function (require, exports, weya_1, project_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var LineElem = /** @class */ (function () {
-        function LineElem(path, lineNo, code, language, clickListener, addListener) {
+        function LineElem(path, lineNo, code, highlighted, language, clickListener, addListener) {
             var _this = this;
             this.onSelectFile = function () {
                 project_1.Project.instance().selectFile(_this.path);
@@ -17,6 +17,7 @@ define(["require", "exports", "./hljs", "./weya", "./project"], function (requir
             this.path = path;
             this.lineNo = lineNo;
             this.code = code;
+            this.highlighted = highlighted;
             this.language = language;
             this.comments = 0;
             this.collapsed = 0;
@@ -49,8 +50,8 @@ define(["require", "exports", "./hljs", "./weya", "./project"], function (requir
             });
             this.codeElem = document.createElement("span");
             if (this.code.trim() !== "") {
-                var h = hljs_1.highlight(this.language, this.code, true, null);
-                this.codeElem.innerHTML = h.value;
+                // let h = highlight(this.language, this.code, true, null);
+                this.codeElem.innerHTML = this.highlighted;
                 this.elem.appendChild(this.codeElem);
             }
             this.codeElem.addEventListener('click', this.onLineClick);

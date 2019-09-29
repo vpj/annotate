@@ -2,12 +2,8 @@ import { api } from "./api";
 import { SourceView } from "./source_view";
 import { SourceCodeMatcher } from "./source_code";
 import { Notes } from "./notes"
-import { Note } from "./note"
 import { Files } from "./files"
 
-declare namespace hljs {
-    function highlight(name, value, ignore_illegals, continuation);
-}
 
 class Project {
     sourceView: SourceView
@@ -22,19 +18,19 @@ class Project {
         this.sourceView = new SourceView(document.getElementById('source_code'),
             this.onCodeClick,
             this.onNoteAdd);
-        this.notes = new Notes(document.getElementById("notes"), this);
+        this.notes = new Notes(document.getElementById("notes"));
         this.files = new Files(document.getElementById("files"),
             this.onFileClick);
     }
 
     static instance() {
-        if(Project._instance == null) {
+        if (Project._instance == null) {
             Project._instance = new Project();
         }
 
         return Project._instance;
     }
-    
+
     selectFile(path: string) {
         this.selected_file = path;
         this.sourceView.selectFile(path);

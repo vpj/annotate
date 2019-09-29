@@ -1,4 +1,4 @@
-define(["require", "exports", "./line", "./util"], function (require, exports, line_1, util_1) {
+define(["require", "exports", "./line", "./util", "./hljs"], function (require, exports, line_1, util_1, hljs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SourceView = /** @class */ (function () {
@@ -92,8 +92,43 @@ define(["require", "exports", "./line", "./util"], function (require, exports, l
                 var lines = files[path];
                 this.allLines[path] = [];
                 var language = util_1.getLanguage(path);
+                var h = hljs_1.highlight(language, lines.join("\n"), true, null);
+                var highlightedLines = h.value.split('\n');
+                if (lines.length === 0) {
+                    highlightedLines = [];
+                }
+                if (highlightedLines.length !== lines.length) {
+                    throw Error("Highlighting Error");
+                }
+                var spans = [];
                 for (var i = 0; i < lines.length; ++i) {
-                    var elem = new line_1.LineElem(path, i, lines[i], language, this.lineClickListener, this.noteAddListener);
+                    var h_1 = highlightedLines[i];
+                    var hu = spans.join('') + h_1;
+                    var ends = [];
+                    for (var j = 0; j < spans.length; ++j) {
+                        ends.push('</span>');
+                    }
+                    hu += ends.join('');
+                    var elem = new line_1.LineElem(path, i, lines[i], hu, language, this.lineClickListener, this.noteAddListener);
+                    var p = 0;
+                    for (var j = 0; true; ++j) {
+                        p = h_1.indexOf('<span', p);
+                        if (p === -1) {
+                            break;
+                        }
+                        var e = h_1.indexOf('>');
+                        spans.push(h_1.slice(p, e + 1));
+                        p++;
+                    }
+                    p = 0;
+                    for (var j = 0; true; ++j) {
+                        p = h_1.indexOf('</span', p);
+                        if (p === -1) {
+                            break;
+                        }
+                        spans.pop();
+                        p++;
+                    }
                     this.allLines[path].push(elem);
                 }
             }

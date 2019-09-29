@@ -9,9 +9,9 @@ const TAGS = {
 };
 
 let TAGS_DICT = {};
-for(let ns in TAGS) {
+for (let ns in TAGS) {
     let tags = TAGS[ns].split(" ");
-    for(let tag of tags) {
+    for (let tag of tags) {
         TAGS_DICT[tag] = ns;
     }
 }
@@ -25,7 +25,7 @@ const NAMESPACES = {
 export type WeyaElement = HTMLElement | SVGElement;
 
 type WeyaTemplateFunction = ($: WeyaElementFunction) => void
-type WeyaElementArg = (string | AttributesInterface | WeyaTemplateFunction| WeyaElement)
+type WeyaElementArg = (string | AttributesInterface | WeyaTemplateFunction | WeyaElement)
 type WeyaElementFunction = (this: WeyaContext | void, ...args: WeyaElementArg[]) => WeyaElement
 
 interface WeyaContext {
@@ -71,16 +71,16 @@ function parseDefinition(str: string): ElemDef {
     let first = parts[0];
     let firstParts = first.split('#');
     res.tag = firstParts[0];
-    if(firstParts.length == 2) {
+    if (firstParts.length == 2) {
         res.id = firstParts[1];
-    } else if(firstParts.length > 2) {
+    } else if (firstParts.length > 2) {
         throw Error("Invalid Definition: " + str)
     }
 
-    if(parts.length > 1) {
+    if (parts.length > 1) {
         res.classes = parts.slice(1);
     }
-    
+
     return res;
 };
 
@@ -102,7 +102,7 @@ function getParameters(args: WeyaElementArg[]) {
                 params.func = arg as WeyaTemplateFunction;
                 break;
             case "object":
-                if(arg instanceof HTMLElement || arg instanceof SVGElement) {
+                if (arg instanceof HTMLElement || arg instanceof SVGElement) {
                     params.parent = arg as WeyaElement;
                 } else {
                     params.attrs = arg as AttributesInterface;
@@ -115,7 +115,7 @@ function getParameters(args: WeyaElementArg[]) {
     return params;
 };
 
-function domAPICreate(): WeyaElementFunction {    
+function domAPICreate(): WeyaElementFunction {
     function setStyles(elem: WeyaElement, styles: StylesInterface) {
         for (let k in styles) {
             let v = styles[k];
@@ -129,7 +129,7 @@ function domAPICreate(): WeyaElementFunction {
     function setEvents(elem: WeyaElement, events: EventsInterface) {
         for (let k in events) {
             let names = k.split('|')
-            for(let name of names) {
+            for (let name of names) {
                 elem.addEventListener(name, events[k], false)
             }
         }
@@ -187,8 +187,8 @@ function domAPICreate(): WeyaElementFunction {
         let params = getParameters(args);
 
         let parent = params.parent;
-        if(this != null && this._elem != null) {
-            if(parent != null) {
+        if (this != null && this._elem != null) {
+            if (parent != null) {
                 throw Error("Cannot set a parent within a context");
             }
             parent = this._elem;

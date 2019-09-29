@@ -1,3 +1,3 @@
-import {Project} from "./project"
+import { Project } from "./project"
 
 Project.instance().load();

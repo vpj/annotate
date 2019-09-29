@@ -1,4 +1,3 @@
-/* From https://github.com/vpj/weya/blob/master/router.ts */
 export class Router {
     private optionalParam = /\((.*?)\)/g;
     private namedParam = /(\(\?)?:\w+/g;

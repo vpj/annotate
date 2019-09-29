@@ -1,5 +1,3 @@
-import { highlight } from "./hljs"
-import { createIcon } from "./util";
 import { Weya as $, WeyaElement } from "./weya";
 import { Project } from "./project";
 
@@ -10,7 +8,6 @@ interface LineClickListener {
 interface NoteAddListener {
     (path: string, start: number, end: number): void
 }
-
 
 class LineElem {
     path: string;
@@ -36,11 +33,13 @@ class LineElem {
     isShowPath: boolean;
     isShowBreakBefore: boolean;
     commentKeys: { [key: string]: boolean };
+    highlighted: string;
 
-    constructor(path: string, lineNo: number, code: string, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
+    constructor(path: string, lineNo: number, code: string, highlighted: string, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
         this.path = path;
         this.lineNo = lineNo;
         this.code = code;
+        this.highlighted = highlighted;
         this.language = language;
 
         this.comments = 0;
@@ -81,8 +80,8 @@ class LineElem {
         this.codeElem = document.createElement("span");
 
         if (this.code.trim() !== "") {
-            let h = highlight(this.language, this.code, true, null);
-            this.codeElem.innerHTML = h.value;
+            // let h = highlight(this.language, this.code, true, null);
+            this.codeElem.innerHTML = this.highlighted;
             this.elem.appendChild(this.codeElem);
         }
 

@@ -1,7 +1,6 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    /* From https://github.com/vpj/weya/blob/master/router.ts */
     var Router = /** @class */ (function () {
         function Router(options) {
             this.optionalParam = /\((.*?)\)/g;

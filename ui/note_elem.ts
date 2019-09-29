@@ -1,6 +1,6 @@
-import {MathJax, MarkDown} from "./markdown";
-import {NoteMatch} from "./source_code";
-import {Note} from "./note";
+import { MathJax, MarkDown } from "./markdown";
+import { NoteMatch } from "./source_code";
+import { Note } from "./note";
 import { createIcon } from "./util";
 
 interface NoteClickListener {
@@ -76,9 +76,9 @@ class NoteViewControls {
     remove: HTMLElement;
 
     constructor(editListener: NoteListener,
-               removeListener: NoteListener,
-               collapseListener: NoteListener,
-               codeCollapseListener: NoteListener) {
+        removeListener: NoteListener,
+        collapseListener: NoteListener,
+        codeCollapseListener: NoteListener) {
         this.elem = document.createElement('div')
         this.elem.className = 'view_controls';
 
@@ -120,9 +120,9 @@ class NoteElem {
     collapseListener: NoteClickListener;
 
     constructor(key: string, note: Note, match: NoteMatch,
-         clickListener: NoteClickListener,
-         updateListener: NoteUpdateListener,
-         collapseListener: NoteClickListener) {
+        clickListener: NoteClickListener,
+        updateListener: NoteUpdateListener,
+        collapseListener: NoteClickListener) {
         this.key = key;
         this.note = note;
         this.match = match;
@@ -140,9 +140,9 @@ class NoteElem {
 
         this.view = document.createElement('div');
         this.viewControls = new NoteViewControls(this.onEdit,
-                                                this.onRemove,
-                                                this.onCollapse,
-                                                this.onCodeCollapse);
+            this.onRemove,
+            this.onCollapse,
+            this.onCodeCollapse);
         this.elem.appendChild(this.view);
         this.elem.appendChild(this.viewControls.elem);
         this.view.className = 'view';
@@ -170,7 +170,7 @@ class NoteElem {
     }
 
     private setCollapseCss() {
-        if(this.note.collapsed) {
+        if (this.note.collapsed) {
             this.elem.classList.add('collapsed');
         } else {
             this.elem.classList.remove('collapsed');
@@ -180,7 +180,7 @@ class NoteElem {
     private onEdit = () => {
         this.edit()
     }
-    
+
     private onRemove = () => {
         this.updateListener(this, false, null, null, null);
     }
@@ -203,7 +203,7 @@ class NoteElem {
         const html = MarkDown.render(this.note.note);
         this.view.innerHTML = html;
         let scripts = this.view.getElementsByTagName('script');
-        for(let i = 0; i < scripts.length; ++i) {
+        for (let i = 0; i < scripts.length; ++i) {
             let s = scripts[i];
             s.innerText = s.innerHTML.replace(/&amp;/g, '&');
         }
@@ -235,4 +235,4 @@ class NoteElem {
     }
 }
 
-export {NoteElem, NoteClickListener}
+export { NoteElem, NoteClickListener }

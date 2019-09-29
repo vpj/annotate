@@ -1,6 +1,3 @@
-import {highlight} from "./hljs"
-import {createIcon} from "./util";
-
 interface FileClickListener {
     (file: string): void
 }
@@ -31,11 +28,11 @@ class FileFolderElem {
         span.textContent = name;
         this.label.appendChild(span);
 
-        if(this.file != '') {
+        if (this.file != '') {
             this.elem.appendChild(this.label);
         }
 
-        this.label.addEventListener('click', () => {this.onClick()});
+        this.label.addEventListener('click', () => { this.onClick() });
     }
 
     protected onClick() {
@@ -55,13 +52,13 @@ class FileElem extends FileFolderElem {
     }
 
     protected onClick() {
-        if(this.clickListener != null) {
+        if (this.clickListener != null) {
             this.clickListener(this.file);
         }
     }
 
     search(s: string): boolean {
-        if(this.name.toLowerCase().indexOf(s) != -1) {
+        if (this.name.toLowerCase().indexOf(s) != -1) {
             this.elem.style.display = 'block';
             return true;
         } else {
@@ -71,7 +68,7 @@ class FileElem extends FileFolderElem {
     }
 
     updateNotes(hasNotes: boolean) {
-        if(hasNotes) {
+        if (hasNotes) {
             this.icon.className = 'fas fa-comments';
         } else {
             this.icon.className = 'far fa-file'
@@ -98,7 +95,7 @@ class FolderElem extends FileFolderElem {
     protected onClick() {
         this.hidden = !this.hidden;
 
-        if(this.hidden) {
+        if (this.hidden) {
             this.icon.className = 'far fa-folder'
             this.content.style.display = 'none';
         } else {
@@ -112,7 +109,7 @@ class FolderElem extends FileFolderElem {
         let suffix = file.substr(prefix.length);
         let parts = suffix.split('/');
         let elem = null;
-        if(parts.length == 1) {
+        if (parts.length == 1) {
             elem = new FileElem(this, parts[0], prefix + parts[0], this.clickListener);
         } else {
             elem = new FolderElem(this, parts[0], prefix + parts[0], this.clickListener);
@@ -120,7 +117,7 @@ class FolderElem extends FileFolderElem {
         this.files.push(elem);
         this.content.appendChild(elem.elem);
 
-        if(parts.length != 1) {
+        if (parts.length != 1) {
             return elem.add(file);
         } else {
             return elem;
@@ -128,16 +125,16 @@ class FolderElem extends FileFolderElem {
     }
 
     add(file: string): FileElem {
-        if(this.files.length == 0) {
+        if (this.files.length == 0) {
             return this.addChild(file);
         }
 
         let last = this.files[this.files.length - 1];
-        if(!(last instanceof FolderElem)) {
+        if (!(last instanceof FolderElem)) {
             return this.addChild(file);
         }
 
-        if(last.isChild(file)) {
+        if (last.isChild(file)) {
             return last.add(file);
         } else {
             return this.addChild(file);
@@ -149,23 +146,23 @@ class FolderElem extends FileFolderElem {
     }
 
     search(s: string): boolean {
-        if(this.name.toLowerCase().indexOf(s) != -1) {
+        if (this.name.toLowerCase().indexOf(s) != -1) {
             this.elem.style.display = 'block';
-            for(let f of this.files) {
+            for (let f of this.files) {
                 f.search('');
             }
             return true;
         } else {
             let found = false;
-            for(let f of this.files) {
-                if(f.search(s)) {
+            for (let f of this.files) {
+                if (f.search(s)) {
                     found = true;
                 }
             }
 
-            if(found) {
+            if (found) {
                 this.elem.style.display = 'block';
-                return true;    
+                return true;
             }
         }
 
@@ -178,7 +175,7 @@ class Files {
     top: FolderElem
     container: HTMLElement;
     search: HTMLInputElement;
-    files: {[path: string]: FileElem}
+    files: { [path: string]: FileElem }
 
     constructor(container: HTMLElement, fileClickListener: FileClickListener) {
         this.container = container;
@@ -195,7 +192,7 @@ class Files {
     }
 
     updateNotes(file: string, hasNotes: boolean) {
-        this.files[file].updateNotes(hasNotes);    
+        this.files[file].updateNotes(hasNotes);
     }
 
     onChange = () => {
@@ -206,10 +203,10 @@ class Files {
     load(files: string[]) {
         this.files = {};
         files.sort();
-        for(let f of files) {
+        for (let f of files) {
             this.files[f] = this.top.add(f);
         }
     }
 }
 
-export {Files};
+export { Files };

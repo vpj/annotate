@@ -23,7 +23,7 @@ Run `server/ann.py` from the folder with your python source code.
 Visit `localhost:8888` in the browser.
 
 ## Roadmap
-◻️  Syntax highlighting for multi-line comments and strings
+✅ Syntax highlighting for multi-line comments and strings
 
 ◻️  Use the urls so that we can use browsers back/forward functions and history
 
