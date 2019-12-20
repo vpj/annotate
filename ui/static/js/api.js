@@ -39,7 +39,7 @@ define(["require", "exports", "./sample_code", "./sample_notes"], function (requ
                     }
                 }
             };
-            xhttp.open('GET', '/source', true);
+            xhttp.open('GET', '/source.json', true);
             xhttp.send();
         };
         AjaxApi.prototype.getNotes = function (callback) {
@@ -55,7 +55,7 @@ define(["require", "exports", "./sample_code", "./sample_notes"], function (requ
                     }
                 }
             };
-            xhttp.open('GET', '/notes', true);
+            xhttp.open('GET', '/notes.json', true);
             xhttp.send();
         };
         AjaxApi.prototype.setNotes = function (notes, callback) {
@@ -66,7 +66,7 @@ define(["require", "exports", "./sample_code", "./sample_notes"], function (requ
                         callback();
                     }
                     else {
-                        alert("Server Error");
+                        alert("Unable to save");
                     }
                 }
             };

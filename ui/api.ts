@@ -36,7 +36,7 @@ class AjaxApi {
             }
         };
           
-        xhttp.open('GET', '/source', true);
+        xhttp.open('GET', '/source.json', true);
         xhttp.send();
     }
 
@@ -53,7 +53,7 @@ class AjaxApi {
             }
         };
           
-        xhttp.open('GET', '/notes', true)
+        xhttp.open('GET', '/notes.json', true)
         xhttp.send();
     }
 
@@ -64,7 +64,7 @@ class AjaxApi {
                 if(this.status == 200) {
                     callback()
                 } else {
-                    alert("Server Error");
+                    alert("Unable to save");
                 }
             }
         };

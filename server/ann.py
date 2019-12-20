@@ -7,6 +7,7 @@ from typing import Optional, Awaitable
 import tornado.ioloop
 import tornado.web
 
+STATIC_PATH = Path(os.path.abspath(__file__)).parent.parent / 'ui' / 'static'
 UI_PATH = Path(os.path.abspath(__file__)).parent.parent / 'ui'
 
 CWD = Path(os.getcwd())
@@ -69,12 +70,19 @@ def save_notes(notes: str):
         return f.write(notes)
 
 
+def save_source(source: str):
+    with open(str(CWD / 'source.json'), 'w') as f:
+        return f.write(source)
+
+
 class SourceHandler(tornado.web.RequestHandler):
     def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
         pass
 
     def get(self):
-        self.write(json.dumps(get_source()))
+        source = json.dumps(get_source())
+        save_source(source)
+        self.write(source)
         self.finish()
 
 
@@ -96,9 +104,10 @@ class NotesHandler(tornado.web.RequestHandler):
 def make_app():
     return tornado.web.Application([
         (r"/", MainHandler),
-        (r"/source", SourceHandler),
-        (r"/notes", NotesHandler),
-        (r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=str(UI_PATH)))
+        (r"/index.html", MainHandler),
+        (r"/source.json", SourceHandler),
+        (r"/notes.json", NotesHandler),
+        (r"/static/(.*)", tornado.web.StaticFileHandler, dict(path=str(STATIC_PATH)))
     ])
 
 
