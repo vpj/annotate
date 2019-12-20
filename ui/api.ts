@@ -36,7 +36,7 @@ class AjaxApi {
             }
         };
           
-        xhttp.open('GET', '/source.json', true);
+        xhttp.open('GET', 'source.json', true);
         xhttp.send();
     }
 
@@ -53,7 +53,7 @@ class AjaxApi {
             }
         };
           
-        xhttp.open('GET', '/notes.json', true)
+        xhttp.open('GET', 'notes.json', true)
         xhttp.send();
     }
 
@@ -69,7 +69,7 @@ class AjaxApi {
             }
         };
           
-        xhttp.open('POST', '/notes', true)
+        xhttp.open('POST', 'notes', true)
         xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send(notes);
     }
