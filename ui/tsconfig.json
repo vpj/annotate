@@ -3,6 +3,6 @@
         "target": "es5",
         "module": "amd",
         "sourceMap": false,
-        "outDir": "static/js"
+        "outDir": "out/js"
     }
 }

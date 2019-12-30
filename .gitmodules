@@ -1,0 +1,3 @@
+[submodule "server/io"]
+	path = server/io
+	url = git@github.com:vpj/IO.git
