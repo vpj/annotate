@@ -4,3 +4,6 @@
 [submodule "lib/io"]
 	path = lib/io
 	url = git@github.com:vpj/IO.git
+[submodule "lib/weya"]
+	path = lib/weya
+	url = git@github.com:vpj/weya.git

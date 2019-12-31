@@ -1,4 +1,4 @@
-import { Weya as $, WeyaElement } from "./weya";
+import { Weya as $, WeyaElement } from "./weya/weya";
 import { Project } from "./project";
 
 interface LineClickListener {
