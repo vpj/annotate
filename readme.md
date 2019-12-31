@@ -18,18 +18,7 @@ and for collaboration.
 
 ## How to use
 
-Run `server/ann.py` from the folder with your python source code.
+Run `node server/out/app.js` from the folder with your python source code.
 
-Visit `localhost:8888` in the browser.
-
-## Roadmap
-✅ Syntax highlighting for multi-line comments and strings
-
-◻️  Use the urls so that we can use browsers back/forward functions and history
-
-✅ Click search results to open file
-
-◻️  Search code
-
-◻️  Use Weya for rendering
+Visit `localhost:8088` in the browser.
 
