@@ -1,3 +1,5 @@
 .DS_Store
 .idea
 server/notes.json
+node_modules
+.*.swp
