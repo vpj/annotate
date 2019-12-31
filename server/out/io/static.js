@@ -28,7 +28,7 @@ class StaticServer {
             if (this.invokeHandler(path, req, res)) {
                 return true;
             }
-            this.serveStatic(path, req, res);
+            this.serveStatic(path, res);
             return true;
         };
         this.staticPath = staticPath;
@@ -54,7 +54,7 @@ class StaticServer {
         });
         return true;
     }
-    serveStatic(path, req, res) {
+    serveStatic(path, res) {
         if ((path.indexOf('/')) === 0) {
             path = path.substr('/'.length);
         }
