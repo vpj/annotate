@@ -1,6 +1,6 @@
 import {sampleCode} from "./sample_code";
 import {sampleNotes} from "./sample_notes";
-import { AjaxHttpPort } from "./io/io_ajax";
+import { AjaxHttpPort } from "./io/ajax";
 
 class FixedApi {
     getSourceLines() {
