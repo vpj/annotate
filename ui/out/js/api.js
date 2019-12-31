@@ -1,4 +1,4 @@
-define(["require", "exports", "./sample_code", "./sample_notes"], function (require, exports, sample_code_1, sample_notes_1) {
+define(["require", "exports", "./sample_code", "./sample_notes", "./io/io_ajax"], function (require, exports, sample_code_1, sample_notes_1, io_ajax_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var FixedApi = /** @class */ (function () {
@@ -77,4 +77,5 @@ define(["require", "exports", "./sample_code", "./sample_notes"], function (requ
         return AjaxApi;
     }());
     exports.api = new AjaxApi();
+    exports.PORT = new io_ajax_1.AjaxHttpPort('http', 'localhost', 8088, '/api');
 });

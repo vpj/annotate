@@ -61,7 +61,7 @@ define(["require", "exports", "./api", "./source_view", "./source_code", "./note
         };
         Project.prototype.updateNotes = function (file, notes) {
             this.files.updateNotes(file, notes[file].length != 0);
-            api_1.api.setNotes(JSON.stringify(notes), function () {
+            api_1.PORT.send('saveNotes', notes, function () {
                 window.status = "Saved";
             });
         };

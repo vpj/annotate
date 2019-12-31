@@ -59,7 +59,7 @@ function getSources() {
         for (let i = 0; i < files.length; ++i) {
             source[PATH.relative(CWD, files[i])] = code[i].split('\n');
         }
-        let sourceStr = JSON.stringify(source);
+        let sourceStr = JSON.stringify(source, null, 2);
         let writeFile = UTIL.promisify(FS.writeFile);
         yield writeFile(PATH.join(CWD, 'source.json'), sourceStr);
         return sourceStr;
@@ -83,4 +83,15 @@ server_1.STATIC_SERVER.addHandler('/notes.json', (req) => __awaiter(void 0, void
 server_1.STATIC_SERVER.addHandler('/source.json', (req) => __awaiter(void 0, void 0, void 0, function* () {
     return { contentString: yield getSources(), contentType: 'application/json' };
 }));
+function handleSaveNotes(data, packet, response) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let notesStr = JSON.stringify(data, null, 2);
+        let writeFile = UTIL.promisify(FS.writeFile);
+        yield writeFile(PATH.join(CWD, 'notes.json'), notesStr);
+        response.success(null);
+    });
+}
+server_1.SERVER.on('saveNotes', (data, packet, response) => {
+    handleSaveNotes(data, packet, response);
+});
 server_1.SERVER.listen();

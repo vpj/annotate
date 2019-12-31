@@ -1,4 +1,5 @@
 import { SERVER, STATIC_SERVER } from "./server"
+import { IOResponse, CallPacket, Data } from "./io/io"
 import * as HTTP from "http"
 import * as UTIL from "util"
 import * as PROCESS from "process"
@@ -13,7 +14,7 @@ let EXTENSIONS = new Set(['.py'])
 
 async function getFileList(path: string): Promise<string[]> {
     let lstat = UTIL.promisify(FS.lstat)
-    if(!(await lstat(path)).isDirectory()) {
+    if (!(await lstat(path)).isDirectory()) {
         throw new AssertionError()
     }
 
@@ -23,14 +24,14 @@ async function getFileList(path: string): Promise<string[]> {
 
     // console.log(files)
 
-    for(let f of files) {
+    for (let f of files) {
         let file_path = PATH.join(path, f)
-        if((await lstat(file_path)).isDirectory()) {
+        if ((await lstat(file_path)).isDirectory()) {
             sourceFiles = sourceFiles.concat(await getFileList(file_path))
         } else {
             let ext = PATH.extname(file_path)
 
-            if(EXTENSIONS.has(ext)) {
+            if (EXTENSIONS.has(ext)) {
                 sourceFiles.push(file_path)
             }
         }
@@ -49,11 +50,11 @@ async function getSources(): Promise<string> {
     let promises = files.map((f) => readSource(f))
     let code = await Promise.all(promises)
     let source = {}
-    for(let i = 0; i < files.length; ++i) {
+    for (let i = 0; i < files.length; ++i) {
         source[PATH.relative(CWD, files[i])] = code[i].split('\n')
     }
 
-    let sourceStr = JSON.stringify(source)
+    let sourceStr = JSON.stringify(source, null, 2)
     let writeFile = UTIL.promisify(FS.writeFile)
     await writeFile(PATH.join(CWD, 'source.json'), sourceStr)
     return sourceStr
@@ -64,17 +65,29 @@ async function getNotes(): Promise<string> {
     try {
         let contents = await readFile(PATH.join(CWD, 'notes.json'), { encoding: 'utf-8' })
         return contents
-    } catch(e) {
+    } catch (e) {
         return '{}'
     }
 }
 
 STATIC_SERVER.addHandler('/notes.json', async (req: HTTP.IncomingMessage) => {
-    return {contentString: await getNotes(), contentType: 'application/json'}
+    return { contentString: await getNotes(), contentType: 'application/json' }
 })
 
 STATIC_SERVER.addHandler('/source.json', async (req: HTTP.IncomingMessage) => {
-    return {contentString: await getSources(), contentType: 'application/json'}
+    return { contentString: await getSources(), contentType: 'application/json' }
+})
+
+async function handleSaveNotes(data: Data, packet: CallPacket, response: IOResponse) {
+    let notesStr = JSON.stringify(data, null, 2)
+    let writeFile = UTIL.promisify(FS.writeFile)
+    await writeFile(PATH.join(CWD, 'notes.json'), notesStr)
+
+    response.success(null)
+}
+
+SERVER.on('saveNotes', (data, packet, response) => {
+    handleSaveNotes(data, packet, response)
 })
 
 SERVER.listen()

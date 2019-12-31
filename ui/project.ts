@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api, PORT } from "./api";
 import { SourceView } from "./source_view";
 import { SourceCodeMatcher } from "./source_code";
 import { Notes } from "./notes"
@@ -83,7 +83,7 @@ class Project {
 
     updateNotes(file: string, notes: { [path: string]: { [key: string]: any }[] }) {
         this.files.updateNotes(file, notes[file].length != 0);
-        api.setNotes(JSON.stringify(notes), () => {
+        PORT.send('saveNotes', notes, () => {
             window.status = "Saved";
         })
     }

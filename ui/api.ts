@@ -1,5 +1,6 @@
 import {sampleCode} from "./sample_code";
 import {sampleNotes} from "./sample_notes";
+import { AjaxHttpPort } from "./io/io_ajax";
 
 class FixedApi {
     getSourceLines() {
@@ -76,3 +77,4 @@ class AjaxApi {
 }
 
 export const api = new AjaxApi();
+export const PORT = new AjaxHttpPort('http', 'localhost', 8088, '/api')
