@@ -1,28 +1,6 @@
-define(["require", "exports", "./sample_code", "./sample_notes", "./io/ajax"], function (require, exports, sample_code_1, sample_notes_1, ajax_1) {
+define(["require", "exports", "./io/ajax"], function (require, exports, ajax_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var FixedApi = /** @class */ (function () {
-        function FixedApi() {
-        }
-        FixedApi.prototype.getSourceLines = function () {
-            return sample_code_1.sampleCode.split("\n");
-        };
-        FixedApi.prototype.getNotes = function () {
-            var notes = [];
-            for (var _i = 0, sampleNotes_1 = sample_notes_1.sampleNotes; _i < sampleNotes_1.length; _i++) {
-                var n = sampleNotes_1[_i];
-                var note = {
-                    'pre': n['pre'],
-                    'code': n['code'],
-                    'post': n['post'],
-                    'note': n['note']
-                };
-                notes.push(note);
-            }
-            return notes;
-        };
-        return FixedApi;
-    }());
     var AjaxApi = /** @class */ (function () {
         function AjaxApi() {
         }
