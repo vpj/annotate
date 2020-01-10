@@ -223,6 +223,13 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
             this.select(path, noteElem.key);
             noteElem.edit();
         };
+        Notes.prototype.setNoteLines = function (path, start, end) {
+            if (!this.selected) {
+                return false;
+            }
+            var selected = this.selected;
+            return selected.setNoteLines(path, start, end);
+        };
         Notes.prototype.moveToLine = function (path, lineNo) {
             for (var k in project_1.Project.instance().sourceView.getCommentKeys(path, lineNo)) {
                 this.select(path, k);

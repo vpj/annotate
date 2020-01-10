@@ -78,7 +78,9 @@ class Project {
     }
 
     private onNoteAdd = (path: string, start: number, end: number) => {
-        this.notes.newNote(path, start, end);
+        if (!this.notes.setNoteLines(path, start, end)) {
+            this.notes.newNote(path, start, end);
+        }
     }
 
     updateNotes(file: string, notes: { [path: string]: { [key: string]: any }[] }) {

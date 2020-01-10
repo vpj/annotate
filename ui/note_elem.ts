@@ -66,6 +66,14 @@ class NoteEditElem {
     getEnd() {
         return parseInt(this.end.value) - 1;
     }
+
+    setStart(lineNo: number) {
+        return this.start.value = `${lineNo + 1}`
+    }
+
+    setEnd(lineNo: number) {
+        return this.end.value = `${lineNo + 1}`
+    }
 }
 
 class NoteViewControls {
@@ -158,6 +166,14 @@ class NoteElem {
         return this.elem !== null;
     }
 
+    isEditing(): boolean {
+        if(!this.isRendered()) {
+            return false
+        }
+
+        return this.elem.classList.contains('editing')
+    }
+
     private onCodeCollapse = () => {
         this.note.codeCollapsed = !this.note.codeCollapsed;
         this.collapseListener(this.note.path, this.key);
@@ -228,6 +244,20 @@ class NoteElem {
     unselect() {
         this.elem.classList.remove('editing');
         this.elem.classList.remove("selected");
+    }
+
+    setNoteLines(path: string, start: number, end: number) {
+        if(this.note.path != path) {
+            return false
+        }
+        if(!this.isEditing()) {
+            return false
+        }
+
+        this.editElem.setStart(start)
+        this.editElem.setEnd(end)
+
+        return true
     }
 
     private onClick = () => {

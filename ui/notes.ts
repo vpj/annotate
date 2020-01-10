@@ -270,6 +270,15 @@ class Notes {
         noteElem.edit();
     }
 
+    setNoteLines(path: string, start: number, end: number) {
+        if(!this.selected) {
+            return false;
+        }
+
+        let selected = this.selected
+        return selected.setNoteLines(path, start, end)
+    }
+
     moveToLine(path: string, lineNo: number) {
         for (let k in Project.instance().sourceView.getCommentKeys(path, lineNo)) {
             this.select(path, k);

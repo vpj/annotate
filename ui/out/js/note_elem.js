@@ -35,6 +35,12 @@ define(["require", "exports", "./markdown", "./util"], function (require, export
         NoteEditElem.prototype.getEnd = function () {
             return parseInt(this.end.value) - 1;
         };
+        NoteEditElem.prototype.setStart = function (lineNo) {
+            return this.start.value = "" + (lineNo + 1);
+        };
+        NoteEditElem.prototype.setEnd = function (lineNo) {
+            return this.end.value = "" + (lineNo + 1);
+        };
         return NoteEditElem;
     }());
     var NoteViewControls = /** @class */ (function () {
@@ -111,6 +117,12 @@ define(["require", "exports", "./markdown", "./util"], function (require, export
         NoteElem.prototype.isRendered = function () {
             return this.elem !== null;
         };
+        NoteElem.prototype.isEditing = function () {
+            if (!this.isRendered()) {
+                return false;
+            }
+            return this.elem.classList.contains('editing');
+        };
         NoteElem.prototype.setCollapseCss = function () {
             if (this.note.collapsed) {
                 this.elem.classList.add('collapsed');
@@ -150,6 +162,17 @@ define(["require", "exports", "./markdown", "./util"], function (require, export
         NoteElem.prototype.unselect = function () {
             this.elem.classList.remove('editing');
             this.elem.classList.remove("selected");
+        };
+        NoteElem.prototype.setNoteLines = function (path, start, end) {
+            if (this.note.path != path) {
+                return false;
+            }
+            if (!this.isEditing()) {
+                return false;
+            }
+            this.editElem.setStart(start);
+            this.editElem.setEnd(end);
+            return true;
         };
         return NoteElem;
     }());

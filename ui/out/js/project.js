@@ -11,7 +11,9 @@ define(["require", "exports", "./api", "./source_view", "./source_code", "./note
                 _this.notes.moveToLine(path, lineNo);
             };
             this.onNoteAdd = function (path, start, end) {
-                _this.notes.newNote(path, start, end);
+                if (!_this.notes.setNoteLines(path, start, end)) {
+                    _this.notes.newNote(path, start, end);
+                }
             };
             this.sourceMatcher = new source_code_1.SourceCodeMatcher();
             this.sourceView = new source_view_1.SourceView(document.getElementById('source_code'), this.onCodeClick, this.onNoteAdd);
