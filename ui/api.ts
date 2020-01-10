@@ -1,5 +1,3 @@
-import { AjaxHttpPort } from "./io/ajax";
-
 class AjaxApi {
     getSourceLines(callback: Function) {
         let xhttp = new XMLHttpRequest();
@@ -54,4 +52,3 @@ class AjaxApi {
 }
 
 export const api = new AjaxApi();
-export const PORT = new AjaxHttpPort('http', 'localhost', 8088, '/api')

@@ -1,7 +1,6 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    /* From https://github.com/vpj/weya/blob/master/router.ts */
     var Router = /** @class */ (function () {
         function Router(options) {
             this.optionalParam = /\((.*?)\)/g;
@@ -148,15 +147,6 @@ define(["require", "exports"], function (require, exports) {
             this.hasPushState = wantsPushState && this.history && this.history.pushState != null;
             this.root = options.root || '/';
             this.root = ("/" + this.root + "/").replace(this.rootStripper, '/');
-            if (this.hasPushState) {
-                window.onpopstate = this.checkUrl;
-            }
-            else if (this.wantsHashChange && (window.onhashchange != null)) {
-                window.onhashchange = this.checkUrl;
-            }
-            else if (this.wantsHashChange) {
-                this.checkUrlInterval = setInterval(this.checkUrl, this.interval);
-            }
             if (options.onerror) {
                 this.onerror = options.onerror;
             }
@@ -165,6 +155,15 @@ define(["require", "exports"], function (require, exports) {
             this.started = true;
             if (this.emulateState && (startState != null)) {
                 this.pushEmulateState(startState.state, startState.title, startState.fragment);
+            }
+            if (this.hasPushState) {
+                window.onpopstate = this.checkUrl;
+            }
+            else if (this.wantsHashChange && (window.onhashchange != null)) {
+                window.onhashchange = this.checkUrl;
+            }
+            else if (this.wantsHashChange) {
+                this.checkUrlInterval = setInterval(this.checkUrl, this.interval);
             }
             this.fragment = this.getFragment();
             if (!silent) {

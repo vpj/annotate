@@ -1,9 +1,9 @@
-import { api, PORT } from "./api";
+import { api } from "./api";
+import { PORT, ROUTER } from "./app"
 import { SourceView } from "./source_view";
 import { SourceCodeMatcher } from "./source_code";
 import { Notes } from "./notes"
 import { Files } from "./files"
-
 
 class Project {
     sourceView: SourceView
@@ -55,22 +55,22 @@ class Project {
                 this.notes.load(all_notes);
 
                 for (let f in files) {
-                    this.selectFile(f);
-                    break;
-                }
-
-                for (let f in files) {
-                    if (all_notes[f].length > 0) {
-                        console.log(f);
-                    }
                     this.files.updateNotes(f, all_notes[f].length != 0)
                 }
+
+                ROUTER.start(null, false)
             })
         })
     }
 
+    getDefaultFile() {
+        for (let f in this.files.files) {
+            return f
+        }
+    }
+
     private onFileClick = (file: string) => {
-        this.selectFile(file);
+        ROUTER.navigate(encodeURIComponent(file))
     }
 
     private onCodeClick = (path: string, lineNo: number) => {
@@ -90,5 +90,13 @@ class Project {
         })
     }
 }
+
+ROUTER.route(':path', [(path: string) => {
+    Project.instance().selectFile(decodeURIComponent(path))
+}])
+
+ROUTER.route('', [(path: string) => {
+    ROUTER.navigate(encodeURIComponent(Project.instance().getDefaultFile()))
+}])
 
 export { Project }

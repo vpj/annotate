@@ -1,3 +1,9 @@
 import { Project } from "./project"
 
-Project.instance().load();
+if (document.readyState === "complete" || document.readyState === 'interactive') {
+    Project.instance().load();
+} else {
+    document.addEventListener('DOMContentLoaded', () => {
+        Project.instance().load();
+    })
+}

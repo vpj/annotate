@@ -1,11 +1,11 @@
-define(["require", "exports", "./api", "./source_view", "./source_code", "./notes", "./files"], function (require, exports, api_1, source_view_1, source_code_1, notes_1, files_1) {
+define(["require", "exports", "./api", "./app", "./source_view", "./source_code", "./notes", "./files"], function (require, exports, api_1, app_1, source_view_1, source_code_1, notes_1, files_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Project = /** @class */ (function () {
         function Project() {
             var _this = this;
             this.onFileClick = function (file) {
-                _this.selectFile(file);
+                app_1.ROUTER.navigate(encodeURIComponent(file));
             };
             this.onCodeClick = function (path, lineNo) {
                 _this.notes.moveToLine(path, lineNo);
@@ -49,21 +49,20 @@ define(["require", "exports", "./api", "./source_view", "./source_code", "./note
                     _this.sourceView.load(all_code);
                     _this.notes.load(all_notes);
                     for (var f in files) {
-                        _this.selectFile(f);
-                        break;
-                    }
-                    for (var f in files) {
-                        if (all_notes[f].length > 0) {
-                            console.log(f);
-                        }
                         _this.files.updateNotes(f, all_notes[f].length != 0);
                     }
+                    app_1.ROUTER.start(null, false);
                 });
             });
         };
+        Project.prototype.getDefaultFile = function () {
+            for (var f in this.files.files) {
+                return f;
+            }
+        };
         Project.prototype.updateNotes = function (file, notes) {
             this.files.updateNotes(file, notes[file].length != 0);
-            api_1.PORT.send('saveNotes', notes, function () {
+            app_1.PORT.send('saveNotes', notes, function () {
                 window.status = "Saved";
             });
         };
@@ -71,4 +70,10 @@ define(["require", "exports", "./api", "./source_view", "./source_code", "./note
         return Project;
     }());
     exports.Project = Project;
+    app_1.ROUTER.route(':path', [function (path) {
+            Project.instance().selectFile(decodeURIComponent(path));
+        }]);
+    app_1.ROUTER.route('', [function (path) {
+            app_1.ROUTER.navigate(encodeURIComponent(Project.instance().getDefaultFile()));
+        }]);
 });
