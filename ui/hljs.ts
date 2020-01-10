@@ -1,3 +1,3 @@
-let highlight = (<any>window).hljs.highlight;
+let highlight = (<any>window).hljs.highlight
 
-export {highlight};
+export { highlight }

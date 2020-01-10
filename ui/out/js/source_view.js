@@ -13,19 +13,19 @@ define(["require", "exports", "./line", "./util", "./hljs"], function (require, 
         SourceView.prototype.setEvents = function () {
             var _this = this;
             this.container.addEventListener('mousedown', function (ev) {
-                // console.log('down', ev.pageX, ev.pageY, ev);
+                // console.log('down', ev.pageX, ev.pageY, ev)
                 _this.onUserSelect(ev.clientX, ev.clientY, 'start');
             });
             this.container.addEventListener('mousemove', function (ev) {
-                // console.log('move', ev.pageX, ev.pageY, ev);
+                // console.log('move', ev.pageX, ev.pageY, ev)
                 _this.onUserSelect(ev.clientX, ev.clientY, 'move');
             });
             this.container.addEventListener('mouseup', function (ev) {
-                // console.log('up', ev.pageX, ev.pageY, ev);
+                // console.log('up', ev.pageX, ev.pageY, ev)
                 _this.onUserSelect(ev.clientX, ev.clientY, 'end');
             });
             this.container.addEventListener('mouseleave', function (ev) {
-                // console.log('leave', ev.pageX, ev.pageY, ev);
+                // console.log('leave', ev.pageX, ev.pageY, ev)
                 _this.onUserSelect(ev.clientX, ev.clientY, 'leave');
             });
         };
@@ -145,11 +145,11 @@ define(["require", "exports", "./line", "./util", "./hljs"], function (require, 
             x -= this.container.getBoundingClientRect().left;
             y -= this.container.getBoundingClientRect().top;
             var line = this.renderedLines[0];
-            // console.log(x, y);
+            // console.log(x, y)
             var height = line.elem.getBoundingClientRect().height;
             var margin = line.codeElem.getBoundingClientRect().left -
                 this.container.getBoundingClientRect().left;
-            // console.log(height, margin);
+            // console.log(height, margin)
             var lineNo = Math.floor(y / height);
             if (event == 'start') {
                 if (x >= margin) {

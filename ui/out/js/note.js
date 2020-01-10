@@ -7,10 +7,10 @@ define(["require", "exports"], function (require, exports) {
         //     post: string[],
         //     code: string[],
         //     note: string) {
-        //         this.pre = pre;
-        //         this.post = post;
-        //         this.code = code;
-        //         this.note = note;
+        //         this.pre = pre
+        //         this.post = post
+        //         this.code = code
+        //         this.note = note
         // }
         function Note(path, opt) {
             this.path = path;

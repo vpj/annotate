@@ -50,7 +50,7 @@ define(["require", "exports", "./weya/weya", "./project"], function (require, ex
             });
             this.codeElem = document.createElement("span");
             if (this.code.trim() !== "") {
-                // let h = highlight(this.language, this.code, true, null);
+                // let h = highlight(this.language, this.code, true, null)
                 this.codeElem.innerHTML = this.highlighted;
                 this.elem.appendChild(this.codeElem);
             }

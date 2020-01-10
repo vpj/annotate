@@ -1,40 +1,29 @@
-// function getElementData(elem: HTMLElement) {
-//     while(elem != null) {
-//         if(elem.annotate != null) {
-//             return elem.annotate;
-//         }
-//         elem = <HTMLElement>elem.parentNode;
-//     }
-
-//     return null;
-// }
-
 function createIcon(name: string): HTMLElement {
-    let icon = document.createElement('i');
-    icon.classList.add('fas');
-    icon.classList.add(`fa-${name}`);
+    let icon = document.createElement('i')
+    icon.classList.add('fas')
+    icon.classList.add(`fa-${name}`)
 
-    return icon;
+    return icon
 }
 
 function getLanguage(path: string) {
-    let parts = path.split('.');
-    let extension = parts[parts.length - 1];
+    let parts = path.split('.')
+    let extension = parts[parts.length - 1]
 
-    switch(extension) {
+    switch (extension) {
         case 'py':
-            return 'python';
+            return 'python'
         case 'php':
-            return 'php';
+            return 'php'
         case 'js':
-            return 'javascript';
+            return 'javascript'
         case 'ts':
-            return 'typescript';
+            return 'typescript'
         case 'md':
-                return 'markdown';
+            return 'markdown'
         default:
-            return 'text';
+            return 'text'
     }
 }
 
-export {createIcon, getLanguage};
+export { createIcon, getLanguage }

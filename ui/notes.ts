@@ -1,213 +1,213 @@
-import { Note } from "./note";
-import { NoteElem } from "./note_elem";
-import { Project } from "./project";
+import { Note } from "./note"
+import { NoteElem } from "./note_elem"
+import { Project } from "./project"
 
-const PADDING = 5;
-const MARGIN_FIRST = 30;
-const MARGIN_OTHER = 5;
+const PADDING = 5
+const MARGIN_FIRST = 30
+const MARGIN_OTHER = 5
 
 class Notes {
-    notes: { [path: string]: { [key: string]: NoteElem } };
-    container: HTMLElement;
-    notesCount: number;
-    selected?: NoteElem;
-    selectedFile?: string;
-    renderedNotes: NoteElem[];
-    notesSearch: HTMLInputElement;
-    searchTerm: string;
+    notes: { [path: string]: { [key: string]: NoteElem } }
+    container: HTMLElement
+    notesCount: number
+    selected?: NoteElem
+    selectedFile?: string
+    renderedNotes: NoteElem[]
+    notesSearch: HTMLInputElement
+    searchTerm: string
 
     constructor(container: HTMLElement) {
-        this.notes = {};
-        this.notesCount = 0;
-        this.container = container;
-        this.selected = null;
-        this.selectedFile = null;
-        this.renderedNotes = [];
-        this.notesSearch = <HTMLInputElement>document.getElementById('notes_search');
-        this.notesSearch.addEventListener('keyup', this.onSearch);
-        this.notesSearch.addEventListener('change', this.onSearch);
-        this.notesSearch.addEventListener('paste', this.onSearch);
+        this.notes = {}
+        this.notesCount = 0
+        this.container = container
+        this.selected = null
+        this.selectedFile = null
+        this.renderedNotes = []
+        this.notesSearch = <HTMLInputElement>document.getElementById('notes_search')
+        this.notesSearch.addEventListener('keyup', this.onSearch)
+        this.notesSearch.addEventListener('change', this.onSearch)
+        this.notesSearch.addEventListener('paste', this.onSearch)
     }
 
     onSearch = () => {
-        let search = this.notesSearch.value;
+        let search = this.notesSearch.value
         if (search === this.searchTerm) {
             return
         }
 
-        this.searchTerm = search;
-        this.selectedFile = null;
-        let selected: NoteElem[] = [];
+        this.searchTerm = search
+        this.selectedFile = null
+        let selected: NoteElem[] = []
         for (let path in this.notes) {
-            let notes = this.notes[path];
+            let notes = this.notes[path]
             for (let key in notes) {
-                let note = notes[key];
+                let note = notes[key]
                 if (note.note.note.toLowerCase().indexOf(search) !== -1) {
-                    selected.push(note);
+                    selected.push(note)
                 }
             }
         }
 
-        Project.instance().sourceView.search();
+        Project.instance().sourceView.search()
 
         for (const note of selected) {
             Project.instance().sourceView.selectLines(note.note.path,
-                note.match.start - 3, note.match.end + 3);
+                note.match.start - 3, note.match.end + 3)
         }
 
-        Project.instance().sourceView.renderSelectedLines();
+        Project.instance().sourceView.renderSelectedLines()
 
-        this.removeAll();
+        this.removeAll()
         for (const note of selected) {
-            this.renderNote(note);
+            this.renderNote(note)
         }
     }
 
 
     private renderNote(note: NoteElem) {
-        note.render();
-        let nextNoteIdx = null;
-        const match = note.match;
-        const path = note.note.path;
+        note.render()
+        let nextNoteIdx = null
+        const match = note.match
+        const path = note.note.path
 
-        let rank = Project.instance().sourceView.getRenderedLineRank(path, match.start);
+        let rank = Project.instance().sourceView.getRenderedLineRank(path, match.start)
         for (let i = 0; i < this.renderedNotes.length; ++i) {
-            let n = this.renderedNotes[i];
-            let r = Project.instance().sourceView.getRenderedLineRank(n.note.path, n.match.start);
+            let n = this.renderedNotes[i]
+            let r = Project.instance().sourceView.getRenderedLineRank(n.note.path, n.match.start)
 
             if (r > rank) {
-                nextNoteIdx = i;
-                break;
+                nextNoteIdx = i
+                break
             }
         }
 
-        note.update();
+        note.update()
 
         if (nextNoteIdx == null) {
-            this.container.appendChild(note.elem);
-            this.renderedNotes.push(note);
+            this.container.appendChild(note.elem)
+            this.renderedNotes.push(note)
         } else {
-            this.container.insertBefore(note.elem, this.renderedNotes[nextNoteIdx].elem);
-            this.renderedNotes.splice(nextNoteIdx, 0, note);
+            this.container.insertBefore(note.elem, this.renderedNotes[nextNoteIdx].elem)
+            this.renderedNotes.splice(nextNoteIdx, 0, note)
         }
 
         if (match.start > match.end) {
-            return;
+            return
         }
         for (let i = match.start; i <= match.start; ++i) {
-            Project.instance().sourceView.addComment(path, i, note.key);
+            Project.instance().sourceView.addComment(path, i, note.key)
         }
 
         if (note.note.codeCollapsed) {
-            Project.instance().sourceView.setCollapsedHeader(path, match.start, true);
+            Project.instance().sourceView.setCollapsedHeader(path, match.start, true)
             for (let i = match.start + 1; i <= match.end; ++i) {
-                Project.instance().sourceView.setCollapsed(path, i, true);
+                Project.instance().sourceView.setCollapsed(path, i, true)
             }
         }
     }
 
     private addNote(note: Note): NoteElem {
-        let match = Project.instance().sourceMatcher.match(note);
-        let key = `${this.notesCount}`;
+        let match = Project.instance().sourceMatcher.match(note)
+        let key = `${this.notesCount}`
         let elem = new NoteElem(key, note, match,
             this.onNoteClick,
             this.onUpdate,
-            this.onCollapseCode);
+            this.onCollapseCode)
 
-        this.notesCount++;
+        this.notesCount++
         if (!(note.path in this.notes)) {
-            this.notes[note.path] = {};
+            this.notes[note.path] = {}
         }
-        this.notes[note.path][key] = elem;
+        this.notes[note.path][key] = elem
 
-        return elem;
+        return elem
     }
 
     load(notes: { [path: string]: { [key: string]: any }[] }) {
-        this.notes = {};
-        this.notesCount = 0;
-        this.selected = null;
-        this.container.innerHTML = '';
+        this.notes = {}
+        this.notesCount = 0
+        this.selected = null
+        this.container.innerHTML = ''
 
         for (let path in notes) {
             for (let n of notes[path]) {
-                let note = new Note(path, n);
-                this.addNote(note);
+                let note = new Note(path, n)
+                this.addNote(note)
             }
         }
     }
 
     private removeAll() {
         for (const n of this.renderedNotes) {
-            n.remove();
+            n.remove()
         }
 
-        this.renderedNotes = [];
-        this.selected = null;
+        this.renderedNotes = []
+        this.selected = null
     }
 
     selectFile(path: string) {
-        this.selectedFile = path;
-        this.searchTerm = null;
-        this.removeAll();
-        let notes = this.notes[path];
+        this.selectedFile = path
+        this.searchTerm = null
+        this.removeAll()
+        let notes = this.notes[path]
 
         for (const k in notes) {
-            this.renderNote(notes[k]);
+            this.renderNote(notes[k])
         }
     }
 
     private onNoteClick = (path: string, key: string) => {
-        const note = this.notes[path][key];
+        const note = this.notes[path][key]
         if (this.selected === note) {
-            this.clearSelected();
+            this.clearSelected()
         } else {
-            let y = note.elem.getBoundingClientRect().top;
-            let lineNo = this.select(path, key);
+            let y = note.elem.getBoundingClientRect().top
+            let lineNo = this.select(path, key)
             if (lineNo != null) {
-                Project.instance().sourceView.scroll(path, lineNo, y);
+                Project.instance().sourceView.scroll(path, lineNo, y)
             }
         }
     }
 
     private create(path: string, text: string, start: number, end: number, opt: {}) {
-        let pre: string[] = [];
-        let code: string[] = [];
-        let post: string[] = [];
+        let pre: string[] = []
+        let code: string[] = []
+        let post: string[] = []
 
         for (let i = -PADDING; i < 0; ++i) {
-            let line = Project.instance().sourceView.getCode(path, start + i);
+            let line = Project.instance().sourceView.getCode(path, start + i)
             if (line != null) {
-                pre.push(line.code);
+                pre.push(line.code)
             }
         }
         for (let i = start; i <= end; ++i) {
-            code.push(Project.instance().sourceView.getCode(path, i).code);
+            code.push(Project.instance().sourceView.getCode(path, i).code)
         }
         for (let i = 1; i <= PADDING; ++i) {
-            let line = Project.instance().sourceView.getCode(path, end + i);
+            let line = Project.instance().sourceView.getCode(path, end + i)
             if (line != null) {
-                post.push(line.code);
+                post.push(line.code)
             }
         }
 
-        let note = Note.create(path, pre, post, code, text, opt);
-        let noteElem = this.addNote(note);
-        this.renderNote(noteElem);
+        let note = Note.create(path, pre, post, code, text, opt)
+        let noteElem = this.addNote(note)
+        this.renderNote(noteElem)
 
-        return noteElem;
+        return noteElem
     }
 
     private onUpdate = (note: NoteElem, isSaveOnly: boolean, start: number, end: number, content: string) => {
         if (!isSaveOnly) {
             if (this.selected === note) {
-                this.clearSelected();
+                this.clearSelected()
             }
-            this.remove(note);
+            this.remove(note)
             if (content != null && content.trim() != '') {
                 let newNote = this.create(note.note.path, content, start, end,
-                    note.note.toJSON());
-                this.select(newNote.note.path, newNote.key);
+                    note.note.toJSON())
+                this.select(newNote.note.path, newNote.key)
             }
         }
 
@@ -215,17 +215,17 @@ class Notes {
     }
 
     private onCollapseCode = (path: string, key: string) => {
-        let note = this.notes[path][key];
-        let match = note.match;
+        let note = this.notes[path][key]
+        let match = note.match
         if (note.note.codeCollapsed) {
-            Project.instance().sourceView.setCollapsedHeader(note.note.path, match.start, true);
+            Project.instance().sourceView.setCollapsedHeader(note.note.path, match.start, true)
             for (let i = match.start + 1; i <= match.end; ++i) {
-                Project.instance().sourceView.setCollapsed(note.note.path, i, true);
+                Project.instance().sourceView.setCollapsed(note.note.path, i, true)
             }
         } else {
-            Project.instance().sourceView.setCollapsedHeader(note.note.path, match.start, false);
+            Project.instance().sourceView.setCollapsedHeader(note.note.path, match.start, false)
             for (let i = match.start + 1; i <= match.end; ++i) {
-                Project.instance().sourceView.setCollapsed(note.note.path, i, false);
+                Project.instance().sourceView.setCollapsed(note.note.path, i, false)
             }
         }
 
@@ -234,45 +234,45 @@ class Notes {
 
     remove(note: NoteElem) {
         if (!note.isRendered()) {
-            return;
+            return
         }
 
-        let path = note.note.path;
-        delete this.notes[path][note.key];
-        note.remove();
+        let path = note.note.path
+        delete this.notes[path][note.key]
+        note.remove()
         for (let i = 0; i < this.renderedNotes.length; ++i) {
             if (this.renderedNotes[i] === note) {
-                this.renderedNotes.splice(i, 1);
-                break;
+                this.renderedNotes.splice(i, 1)
+                break
             }
         }
 
-        let match = note.match;
+        let match = note.match
         if (match.start > match.end) {
-            return;
+            return
         }
 
         for (let i = match.start; i <= match.start; ++i) {
-            Project.instance().sourceView.removeComment(path, i, note.key);
+            Project.instance().sourceView.removeComment(path, i, note.key)
         }
 
         if (note.note.codeCollapsed) {
-            Project.instance().sourceView.setCollapsedHeader(path, match.start, false);
+            Project.instance().sourceView.setCollapsedHeader(path, match.start, false)
             for (let i = match.start + 1; i <= match.end; ++i) {
-                Project.instance().sourceView.setCollapsed(path, i, false);
+                Project.instance().sourceView.setCollapsed(path, i, false)
             }
         }
     }
 
     newNote(path: string, start: number, end: number) {
-        let noteElem = this.create(path, '', start, end, {});
-        this.select(path, noteElem.key);
-        noteElem.edit();
+        let noteElem = this.create(path, '', start, end, {})
+        this.select(path, noteElem.key)
+        noteElem.edit()
     }
 
     setNoteLines(path: string, start: number, end: number) {
-        if(!this.selected) {
-            return false;
+        if (!this.selected) {
+            return false
         }
 
         let selected = this.selected
@@ -281,70 +281,70 @@ class Notes {
 
     moveToLine(path: string, lineNo: number) {
         for (let k in Project.instance().sourceView.getCommentKeys(path, lineNo)) {
-            this.select(path, k);
-            break;
+            this.select(path, k)
+            break
         }
     }
 
     clearSelected() {
         if (this.selected) {
-            let oldNote = this.notes[this.selected.note.path][this.selected.key];
-            oldNote.unselect();
+            let oldNote = this.notes[this.selected.note.path][this.selected.key]
+            oldNote.unselect()
             for (let i = oldNote.match.start; i <= oldNote.match.end; ++i) {
-                Project.instance().sourceView.setSelected(this.selected.note.path, i, false);
+                Project.instance().sourceView.setSelected(this.selected.note.path, i, false)
             }
-            this.selected = null;
+            this.selected = null
             if (oldNote.note.note.trim() == '') {
-                this.remove(oldNote);
+                this.remove(oldNote)
             }
         }
     }
 
     select(path: string, key: string) {
-        this.clearSelected();
+        this.clearSelected()
 
-        let note = this.notes[path][key];
-        note.select();
+        let note = this.notes[path][key]
+        note.select()
         for (let i = note.match.start; i <= note.match.end; ++i) {
-            Project.instance().sourceView.setSelected(path, i, true);
+            Project.instance().sourceView.setSelected(path, i, true)
         }
-        this.selected = note;
-        let start = note.match.start;
-        let isFirst = this.renderedNotes[0] === note;
+        this.selected = note
+        let start = note.match.start
+        let isFirst = this.renderedNotes[0] === note
 
         if (note.match.start > note.match.end) {
-            return null;
+            return null
         }
 
         window.requestAnimationFrame(() => {
-            let y = Project.instance().sourceView.getY(path, start);
-            let yn = note.getY();
+            let y = Project.instance().sourceView.getY(path, start)
+            let yn = note.getY()
 
-            let transform = y - yn;
+            let transform = y - yn
             if (isFirst)
-                transform -= MARGIN_FIRST;
+                transform -= MARGIN_FIRST
             else
-                transform -= MARGIN_OTHER;
+                transform -= MARGIN_OTHER
 
-            this.container.style.transform = `translateY(${transform}px)`;
+            this.container.style.transform = `translateY(${transform}px)`
         })
 
-        return start;
+        return start
     }
 
     toJSON(): { [path: string]: { [key: string]: any }[] } {
-        let allNotes = {};
+        let allNotes = {}
         for (let path in this.notes) {
-            let json = [];
+            let json = []
             for (let k in this.notes[path]) {
-                let n = this.notes[path][k];
-                json.push(n.note.toJSON());
+                let n = this.notes[path][k]
+                json.push(n.note.toJSON())
             }
-            allNotes[path] = json;
+            allNotes[path] = json
         }
 
-        return allNotes;
+        return allNotes
     }
 }
 
-export { Notes };
+export { Notes }

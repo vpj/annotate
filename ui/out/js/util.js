@@ -1,15 +1,6 @@
-// function getElementData(elem: HTMLElement) {
-//     while(elem != null) {
-//         if(elem.annotate != null) {
-//             return elem.annotate;
-//         }
-//         elem = <HTMLElement>elem.parentNode;
-//     }
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    //     return null;
-    // }
     function createIcon(name) {
         var icon = document.createElement('i');
         icon.classList.add('fas');

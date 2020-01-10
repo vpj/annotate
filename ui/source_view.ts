@@ -1,170 +1,170 @@
 import { LineElem, LineClickListener, NoteAddListener } from "./line"
-import { getLanguage } from "./util";
+import { getLanguage } from "./util"
 import { highlight } from "./hljs"
 
 class SourceView {
     renderedLines: LineElem[]
     allLines: { [path: string]: LineElem[] }
     selectedFile: string
-    lineClickListener: LineClickListener;
-    noteAddListener: NoteAddListener;
-    container: HTMLElement;
+    lineClickListener: LineClickListener
+    noteAddListener: NoteAddListener
+    container: HTMLElement
     userSelection?: any
-    selectedLines: { [path: string]: { [lineNo: number]: boolean } };
+    selectedLines: { [path: string]: { [lineNo: number]: boolean } }
 
     constructor(container: HTMLElement, lineClickListener: LineClickListener, noteAddListener: NoteAddListener) {
-        this.allLines = {};
-        this.renderedLines = [];
-        this.container = container;
-        this.lineClickListener = lineClickListener;
-        this.noteAddListener = noteAddListener;
+        this.allLines = {}
+        this.renderedLines = []
+        this.container = container
+        this.lineClickListener = lineClickListener
+        this.noteAddListener = noteAddListener
 
-        this.setEvents();
+        this.setEvents()
     }
 
     private setEvents() {
         this.container.addEventListener('mousedown', (ev) => {
-            // console.log('down', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.clientX, ev.clientY, 'start');
-        });
+            // console.log('down', ev.pageX, ev.pageY, ev)
+            this.onUserSelect(ev.clientX, ev.clientY, 'start')
+        })
         this.container.addEventListener('mousemove', (ev) => {
-            // console.log('move', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.clientX, ev.clientY, 'move');
-        });
+            // console.log('move', ev.pageX, ev.pageY, ev)
+            this.onUserSelect(ev.clientX, ev.clientY, 'move')
+        })
         this.container.addEventListener('mouseup', (ev) => {
-            // console.log('up', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.clientX, ev.clientY, 'end');
-        });
+            // console.log('up', ev.pageX, ev.pageY, ev)
+            this.onUserSelect(ev.clientX, ev.clientY, 'end')
+        })
         this.container.addEventListener('mouseleave', (ev) => {
-            // console.log('leave', ev.pageX, ev.pageY, ev);
-            this.onUserSelect(ev.clientX, ev.clientY, 'leave');
-        });
+            // console.log('leave', ev.pageX, ev.pageY, ev)
+            this.onUserSelect(ev.clientX, ev.clientY, 'leave')
+        })
     }
 
     private removeAll() {
         for (let line of this.renderedLines) {
-            line.remove();
+            line.remove()
         }
-        this.renderedLines = [];
+        this.renderedLines = []
     }
 
     search() {
-        this.selectedFile = null;
-        this.selectedLines = {};
-        this.removeAll();
+        this.selectedFile = null
+        this.selectedLines = {}
+        this.removeAll()
     }
 
     selectLines(path: string, start: number, end: number) {
-        let lines = this.allLines[path];
+        let lines = this.allLines[path]
 
-        start = Math.max(0, start);
-        end = Math.min(lines.length - 1, end);
+        start = Math.max(0, start)
+        end = Math.min(lines.length - 1, end)
 
         if (this.selectedLines[path] == null) {
-            this.selectedLines[path] = {};
+            this.selectedLines[path] = {}
 
         }
         for (let i = start; i < end; ++i) {
-            this.selectedLines[path][i] = true;
+            this.selectedLines[path][i] = true
         }
     }
 
     renderSelectedLines() {
         for (let path in this.selectedLines) {
-            let lineNos: number[] = [];
+            let lineNos: number[] = []
             for (let lineNo in this.selectedLines[path]) {
-                lineNos.push(parseInt(lineNo));
+                lineNos.push(parseInt(lineNo))
             }
 
-            lineNos.sort((x, y) => { return x - y });
-            let prev: number = null;
+            lineNos.sort((x, y) => { return x - y })
+            let prev: number = null
 
             for (let lineNo of lineNos.slice(1)) {
-                let line = this.allLines[path][lineNo];
+                let line = this.allLines[path][lineNo]
                 if (prev == null) {
-                    line.showPath();
+                    line.showPath()
                 } else if (prev !== lineNo - 1) {
-                    line.showBreakBefore();
+                    line.showBreakBefore()
                 }
-                prev = lineNo;
-                line.render(this.renderedLines.length);
-                this.renderedLines.push(line);
-                this.container.appendChild(line.elem);
+                prev = lineNo
+                line.render(this.renderedLines.length)
+                this.renderedLines.push(line)
+                this.container.appendChild(line.elem)
             }
         }
     }
 
     selectFile(path: string) {
-        this.selectedFile = path;
-        this.removeAll();
-        let lines = this.allLines[path];
+        this.selectedFile = path
+        this.removeAll()
+        let lines = this.allLines[path]
 
         for (let i = 0; i < lines.length; ++i) {
-            const elem = lines[i];
-            elem.render(i);
-            this.renderedLines.push(elem);
-            this.container.appendChild(elem.elem);
+            const elem = lines[i]
+            elem.render(i)
+            this.renderedLines.push(elem)
+            this.container.appendChild(elem.elem)
         }
     }
 
     load(files: { [path: string]: string[] }) {
         for (let path in files) {
-            const lines = files[path];
-            this.allLines[path] = [];
-            const language = getLanguage(path);
-            let h = highlight(language, lines.join("\n"), true, null);
-            let highlightedLines: string[] = h.value.split('\n');
+            const lines = files[path]
+            this.allLines[path] = []
+            const language = getLanguage(path)
+            let h = highlight(language, lines.join("\n"), true, null)
+            let highlightedLines: string[] = h.value.split('\n')
             if (lines.length === 0) {
-                highlightedLines = [];
+                highlightedLines = []
             }
             if (highlightedLines.length !== lines.length) {
-                throw Error("Highlighting Error");
+                throw Error("Highlighting Error")
             }
 
-            let spans = [];
+            let spans = []
             for (let i = 0; i < lines.length; ++i) {
-                let h = highlightedLines[i];
-                let hu = spans.join('') + h;
-                let ends = [];
+                let h = highlightedLines[i]
+                let hu = spans.join('') + h
+                let ends = []
                 for (let j = 0; j < spans.length; ++j) {
-                    ends.push('</span>');
+                    ends.push('</span>')
                 }
-                hu += ends.join('');
+                hu += ends.join('')
 
                 let elem = new LineElem(path, i, lines[i], hu,
                     language,
                     this.lineClickListener,
-                    this.noteAddListener);
+                    this.noteAddListener)
 
-                let p = 0;
+                let p = 0
                 for (let j = 0; true; ++j) {
-                    p = h.indexOf('<span', p);
+                    p = h.indexOf('<span', p)
                     if (p === -1) {
-                        break;
+                        break
                     }
 
-                    let e = h.indexOf('>');
-                    spans.push(h.slice(p, e + 1));
-                    p++;
+                    let e = h.indexOf('>')
+                    spans.push(h.slice(p, e + 1))
+                    p++
                 }
-                p = 0;
+                p = 0
                 for (let j = 0; true; ++j) {
-                    p = h.indexOf('</span', p);
+                    p = h.indexOf('</span', p)
                     if (p === -1) {
-                        break;
+                        break
                     }
 
-                    spans.pop();
-                    p++;
+                    spans.pop()
+                    p++
                 }
 
-                this.allLines[path].push(elem);
+                this.allLines[path].push(elem)
             }
         }
     }
 
     getRenderedLineRank(path: string, lineNo: number): number {
-        if(lineNo > 1e8) {
+        if (lineNo > 1e8) {
             return lineNo
         }
         return this.allLines[path][lineNo].rank
@@ -172,86 +172,86 @@ class SourceView {
 
     onUserSelect(x: number, y: number, event: string) {
         if (this.renderedLines.length == 0)
-            return;
+            return
 
-        x -= this.container.getBoundingClientRect().left;
-        y -= this.container.getBoundingClientRect().top;
+        x -= this.container.getBoundingClientRect().left
+        y -= this.container.getBoundingClientRect().top
 
-        let line = this.renderedLines[0];
+        let line = this.renderedLines[0]
 
-        // console.log(x, y);
+        // console.log(x, y)
 
-        let height = line.elem.getBoundingClientRect().height;
+        let height = line.elem.getBoundingClientRect().height
         let margin = line.codeElem.getBoundingClientRect().left -
-            this.container.getBoundingClientRect().left;
+            this.container.getBoundingClientRect().left
 
-        // console.log(height, margin);
+        // console.log(height, margin)
 
-        let lineNo = Math.floor(y / height);
+        let lineNo = Math.floor(y / height)
 
         if (event == 'start') {
             if (x >= margin) {
-                this.clearUserSelection();
-                return;
+                this.clearUserSelection()
+                return
             }
 
             this.userSelection = {
                 start: lineNo,
                 end: lineNo
-            };
+            }
 
-            this.markUserSelection();
+            this.markUserSelection()
         } else if (event == 'move') {
             if (this.userSelection == null)
-                return;
-            this.userSelection.end = lineNo;
-            this.markUserSelection();
+                return
+            this.userSelection.end = lineNo
+            this.markUserSelection()
         } else if (event == 'leave') {
             if (this.userSelection == null)
-                return;
-            this.clearUserSelection();
+                return
+            this.clearUserSelection()
         } else {
             if (this.userSelection == null)
-                return;
-            let f = Math.min(this.userSelection.start, this.userSelection.end);
-            let t = Math.max(this.userSelection.start, this.userSelection.end);
+                return
+            let f = Math.min(this.userSelection.start, this.userSelection.end)
+            let t = Math.max(this.userSelection.start, this.userSelection.end)
             if (f != t) {
                 this.noteAddListener(this.selectedFile, f, t)
             }
-            this.clearUserSelection();
+            this.clearUserSelection()
         }
     }
 
     markUserSelection() {
         for (let l of this.renderedLines) {
-            l.userSelect(false);
+            l.userSelect(false)
         }
 
         if (this.userSelection == null)
-            return;
+            return
 
-        let f = Math.min(this.userSelection.start, this.userSelection.end);
-        let t = Math.max(this.userSelection.start, this.userSelection.end);
+        let f = Math.min(this.userSelection.start, this.userSelection.end)
+        let t = Math.max(this.userSelection.start, this.userSelection.end)
         for (let i = f; i <= t; ++i) {
-            this.renderedLines[i].userSelect(true);
+            this.renderedLines[i].userSelect(true)
         }
     }
 
     clearUserSelection() {
-        this.userSelection = null;
-        this.markUserSelection();
+        this.userSelection = null
+        this.markUserSelection()
     }
 
     addComment(path: string, lineNo: number, key: string) {
-        this.allLines[path][lineNo].addComment(key);
+        this.allLines[path][lineNo].addComment(key)
     }
 
     removeComment(path: string, lineNo: number, key: string) {
-        this.allLines[path][lineNo].removeComment(key);
+        this.allLines[path][lineNo].removeComment(key)
     }
 
     getCommentKeys(path: string, lineNo: number): { [key: string]: boolean } {
-        return this.allLines[path][lineNo].getCommentKeys();
+        return this.allLines[path][lineNo].getCommentKeys()
     }
 
     setCollapsedHeader(path: string, lineNo: number, isHeader: boolean) {
@@ -263,36 +263,36 @@ class SourceView {
     }
 
     setSelected(path: string, lineNo: number, isSelected: boolean) {
-        this.allLines[path][lineNo].setSelected(isSelected);
+        this.allLines[path][lineNo].setSelected(isSelected)
     }
 
     getY(path: string, lineNo: number) {
-        return this.allLines[path][lineNo].getY();
+        return this.allLines[path][lineNo].getY()
     }
 
     scroll(path: string, lineNo: number, offset: number) {
-        const line = this.allLines[path][lineNo];
+        const line = this.allLines[path][lineNo]
         if (!line.isRendered()) {
-            return;
+            return
         }
 
-        let node = this.container;
-        let containerOffset = 0;
+        let node = this.container
+        let containerOffset = 0
         while (node != null) {
-            containerOffset += node.offsetTop;
-            node = node.parentElement;
+            containerOffset += node.offsetTop
+            node = node.parentElement
         }
-        window.scroll(0, line.getY() + containerOffset - Math.round(offset));
+        window.scroll(0, line.getY() + containerOffset - Math.round(offset))
     }
 
     getCode(path: string, lineNo: number) {
-        let lines = this.allLines[path];
+        let lines = this.allLines[path]
 
         if (lineNo < 0 || lineNo >= lines.length) {
-            return null;
+            return null
         }
 
-        return lines[lineNo];
+        return lines[lineNo]
     }
 }
 
