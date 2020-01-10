@@ -164,7 +164,10 @@ class SourceView {
     }
 
     getRenderedLineRank(path: string, lineNo: number): number {
-        return this.allLines[path][lineNo].rank;
+        if(lineNo > 1e8) {
+            return lineNo
+        }
+        return this.allLines[path][lineNo].rank
     }
 
     onUserSelect(x: number, y: number, event: string) {

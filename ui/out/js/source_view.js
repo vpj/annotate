@@ -134,6 +134,9 @@ define(["require", "exports", "./line", "./util", "./hljs"], function (require, 
             }
         };
         SourceView.prototype.getRenderedLineRank = function (path, lineNo) {
+            if (lineNo > 1e8) {
+                return lineNo;
+            }
             return this.allLines[path][lineNo].rank;
         };
         SourceView.prototype.onUserSelect = function (x, y, event) {
