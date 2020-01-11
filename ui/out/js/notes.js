@@ -183,6 +183,32 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
             }
             this.selectDefault();
         };
+        Notes.prototype.selectLines = function (selectedLines) {
+            this.searchTerm = null;
+            this.selectedFile = null;
+            var selected = [];
+            for (var path in selectedLines) {
+                var notes = this.notes[path];
+                var lines = selectedLines[path];
+                for (var key in notes) {
+                    var note = notes[key];
+                    if (lines[note.match.start]) {
+                        selected.push(note);
+                    }
+                }
+            }
+            for (var _i = 0, selected_3 = selected; _i < selected_3.length; _i++) {
+                var note = selected_3[_i];
+                project_1.Project.instance().sourceView.selectLines(note.note.path, note.match.start - 3, note.match.end + 3);
+            }
+            project_1.Project.instance().sourceView.renderSelectedLines();
+            this.removeAll();
+            for (var _a = 0, selected_4 = selected; _a < selected_4.length; _a++) {
+                var note = selected_4[_a];
+                this.renderNote(note);
+            }
+            this.selectDefault();
+        };
         Notes.prototype.create = function (path, text, start, end, opt) {
             var pre = [];
             var code = [];

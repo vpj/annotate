@@ -1,14 +1,37 @@
-define(["require", "exports", "./line", "./util", "./hljs"], function (require, exports, line_1, util_1, hljs_1) {
+define(["require", "exports", "./line", "./util", "./hljs", "./project"], function (require, exports, line_1, util_1, hljs_1, project_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SourceView = /** @class */ (function () {
         function SourceView(container, lineClickListener, noteAddListener) {
+            var _this = this;
+            this.onSearch = function () {
+                var search = _this.searchElem.value;
+                if (search === _this.searchTerm) {
+                    return;
+                }
+                _this.search();
+                for (var path in _this.allLines) {
+                    var lines = _this.allLines[path];
+                    for (var i = 0; i < lines.length; ++i) {
+                        if (lines[i].code.toLowerCase().indexOf(search) !== -1) {
+                            _this.selectLines(path, Math.max(0, i - 2), Math.min(lines.length - 1, i + 2));
+                        }
+                    }
+                }
+                // TODO: repeat this until more lines are selected
+                project_1.Project.instance().notes.selectLines(_this.selectedLines);
+                // this.renderSelectedLines()
+            };
             this.allLines = {};
             this.renderedLines = [];
             this.container = container;
             this.lineClickListener = lineClickListener;
             this.noteAddListener = noteAddListener;
             this.setEvents();
+            this.searchElem = document.getElementById('code_search');
+            this.searchElem.addEventListener('keyup', this.onSearch);
+            this.searchElem.addEventListener('change', this.onSearch);
+            this.searchElem.addEventListener('paste', this.onSearch);
         }
         SourceView.prototype.setEvents = function () {
             var _this = this;

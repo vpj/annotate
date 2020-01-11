@@ -1,6 +1,7 @@
 import { LineElem, LineClickListener, NoteAddListener } from "./line"
 import { getLanguage } from "./util"
 import { highlight } from "./hljs"
+import { Project } from "./project"
 
 class SourceView {
     renderedLines: LineElem[]
@@ -11,6 +12,8 @@ class SourceView {
     container: HTMLElement
     userSelection?: any
     selectedLines: { [path: string]: { [lineNo: number]: boolean } }
+    searchElem: HTMLInputElement
+    searchTerm: string
 
     constructor(container: HTMLElement, lineClickListener: LineClickListener, noteAddListener: NoteAddListener) {
         this.allLines = {}
@@ -20,6 +23,11 @@ class SourceView {
         this.noteAddListener = noteAddListener
 
         this.setEvents()
+
+        this.searchElem = <HTMLInputElement>document.getElementById('code_search')
+        this.searchElem.addEventListener('keyup', this.onSearch)
+        this.searchElem.addEventListener('change', this.onSearch)
+        this.searchElem.addEventListener('paste', this.onSearch)
     }
 
     private setEvents() {
@@ -39,6 +47,29 @@ class SourceView {
             // console.log('leave', ev.pageX, ev.pageY, ev)
             this.onUserSelect(ev.clientX, ev.clientY, 'leave')
         })
+    }
+
+    private onSearch = () => {
+        let search = this.searchElem.value
+        if (search === this.searchTerm) {
+            return
+        }
+
+        this.search()
+
+        for(let path in this.allLines) {
+            let lines = this.allLines[path]
+            for(let i = 0; i < lines.length; ++i) {
+                if (lines[i].code.toLowerCase().indexOf(search) !== -1) {
+                    this.selectLines(path, Math.max(0, i - 2), Math.min(lines.length - 1, i + 2))
+                }
+            }
+        }
+
+        // TODO: repeat this until more lines are selected
+        Project.instance().notes.selectLines(this.selectedLines)
+
+        // this.renderSelectedLines()
     }
 
     private removeAll() {

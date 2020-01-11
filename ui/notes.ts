@@ -80,6 +80,7 @@ class Notes {
             this.select(note.note.path, note.key)
         })
     }
+
     private renderNote(note: NoteElem) {
         note.render()
         let nextNoteIdx = null
@@ -171,6 +172,36 @@ class Notes {
         for (const k in notes) {
             this.renderNote(notes[k])
         }
+        this.selectDefault()
+    }
+
+    selectLines(selectedLines: { [path: string]: { [lineNo: number]: boolean } }) {
+        this.searchTerm = null
+        this.selectedFile = null
+        let selected: NoteElem[] = []
+        for (let path in selectedLines) {
+            let notes = this.notes[path]
+            let lines = selectedLines[path]
+            for (let key in notes) {
+                let note = notes[key]
+                if(lines[note.match.start]) {
+                    selected.push(note)
+                }
+            }
+        }
+
+        for (const note of selected) {
+            Project.instance().sourceView.selectLines(note.note.path,
+                note.match.start - 3, note.match.end + 3)
+        }
+
+        Project.instance().sourceView.renderSelectedLines()
+
+        this.removeAll()
+        for (const note of selected) {
+            this.renderNote(note)
+        }
+
         this.selectDefault()
     }
 
