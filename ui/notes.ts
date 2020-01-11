@@ -61,9 +61,20 @@ class Notes {
         for (const note of selected) {
             this.renderNote(note)
         }
+
+        this.selectDefault()
     }
 
+    private selectDefault() {
+        if (this.renderedNotes.length == 0) {
+            return
+        }
 
+        let note = this.renderedNotes[0]
+        window.requestAnimationFrame(() => {
+            this.select(note.note.path, note.key)
+        })
+    }
     private renderNote(note: NoteElem) {
         note.render()
         let nextNoteIdx = null
@@ -155,6 +166,7 @@ class Notes {
         for (const k in notes) {
             this.renderNote(notes[k])
         }
+        this.selectDefault()
     }
 
     private onNoteClick = (path: string, key: string) => {
@@ -301,7 +313,7 @@ class Notes {
     }
 
     private resetTransforms() {
-        for(let note of this.renderedNotes) {
+        for (let note of this.renderedNotes) {
             note.resetTransform()
         }
     }
@@ -334,15 +346,15 @@ class Notes {
         note.setTransform(transform)
 
         let idx = this.renderedNotes.length
-        for(let i = 0; i < this.renderedNotes.length; ++i) {
-            if(this.renderedNotes[i] == note) {
+        for (let i = 0; i < this.renderedNotes.length; ++i) {
+            if (this.renderedNotes[i] == note) {
                 idx = i
                 break
             }
         }
 
         let prev = transform;
-        for(let i = idx - 1; i >= 0; --i) {
+        for (let i = idx - 1; i >= 0; --i) {
             let n = this.renderedNotes[i]
             let t = this.getAlignmentTransform(n)
             t = Math.min(prev, t)
@@ -351,7 +363,7 @@ class Notes {
         }
 
         prev = transform
-        for(let i = idx + 1; i < this.renderedNotes.length; ++i) {
+        for (let i = idx + 1; i < this.renderedNotes.length; ++i) {
             let n = this.renderedNotes[i]
             let t = this.getAlignmentTransform(n)
             t = Math.max(prev, t)

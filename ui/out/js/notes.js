@@ -35,6 +35,7 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
                     var note = selected_2[_a];
                     _this.renderNote(note);
                 }
+                _this.selectDefault();
             };
             this.onNoteClick = function (path, key) {
                 var note = _this.notes[path][key];
@@ -90,6 +91,16 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
             this.notesSearch.addEventListener('change', this.onSearch);
             this.notesSearch.addEventListener('paste', this.onSearch);
         }
+        Notes.prototype.selectDefault = function () {
+            var _this = this;
+            if (this.renderedNotes.length == 0) {
+                return;
+            }
+            var note = this.renderedNotes[0];
+            window.requestAnimationFrame(function () {
+                _this.select(note.note.path, note.key);
+            });
+        };
         Notes.prototype.renderNote = function (note) {
             note.render();
             var nextNoteIdx = null;
@@ -166,6 +177,7 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
             for (var k in notes) {
                 this.renderNote(notes[k]);
             }
+            this.selectDefault();
         };
         Notes.prototype.create = function (path, text, start, end, opt) {
             var pre = [];
