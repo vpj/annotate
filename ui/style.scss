@@ -377,3 +377,14 @@ div.note {
     cursor: pointer;
   }
 }
+
+#made_with {
+    padding: 50px;
+    font-size: 12px;
+    font-style: italic;
+
+    a {
+        color: #ffffff;
+        font-weight: bold;
+    }
+}

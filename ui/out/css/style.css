@@ -288,3 +288,11 @@ div.note {
     color: #aaa;
     margin-left: 10px;
     cursor: pointer; }
+
+#made_with {
+  padding: 50px;
+  font-size: 12px;
+  font-style: italic; }
+  #made_with a {
+    color: #ffffff;
+    font-weight: bold; }
