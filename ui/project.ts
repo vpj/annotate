@@ -69,6 +69,11 @@ class Project {
         }
     }
 
+    searchNotes(search: string) {
+        ROUTER.navigate(`s/${encodeURIComponent(search)}`, {trigger: false})
+        this.notes.search(search)
+    }
+
     private onFileClick = (file: string) => {
         ROUTER.navigate(encodeURIComponent(file))
     }
@@ -90,6 +95,10 @@ class Project {
         })
     }
 }
+
+ROUTER.route('s/:search', [(search: string) => {
+    Project.instance().notes.search(search)
+}])
 
 ROUTER.route(':path', [(path: string) => {
     Project.instance().selectFile(decodeURIComponent(path))

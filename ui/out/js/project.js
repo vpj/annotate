@@ -60,6 +60,10 @@ define(["require", "exports", "./api", "./app", "./source_view", "./source_code"
                 return f;
             }
         };
+        Project.prototype.searchNotes = function (search) {
+            app_1.ROUTER.navigate("s/" + encodeURIComponent(search), { trigger: false });
+            this.notes.search(search);
+        };
         Project.prototype.updateNotes = function (file, notes) {
             this.files.updateNotes(file, notes[file].length != 0);
             app_1.PORT.send('saveNotes', notes, function () {
@@ -70,6 +74,9 @@ define(["require", "exports", "./api", "./app", "./source_view", "./source_code"
         return Project;
     }());
     exports.Project = Project;
+    app_1.ROUTER.route('s/:search', [function (search) {
+            Project.instance().notes.search(search);
+        }]);
     app_1.ROUTER.route(':path', [function (path) {
             Project.instance().selectFile(decodeURIComponent(path));
         }]);

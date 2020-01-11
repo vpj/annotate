@@ -12,30 +12,8 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
                 if (search === _this.searchTerm) {
                     return;
                 }
-                _this.searchTerm = search;
-                _this.selectedFile = null;
-                var selected = [];
-                for (var path in _this.notes) {
-                    var notes = _this.notes[path];
-                    for (var key in notes) {
-                        var note = notes[key];
-                        if (note.note.note.toLowerCase().indexOf(search) !== -1) {
-                            selected.push(note);
-                        }
-                    }
-                }
-                project_1.Project.instance().sourceView.search();
-                for (var _i = 0, selected_1 = selected; _i < selected_1.length; _i++) {
-                    var note = selected_1[_i];
-                    project_1.Project.instance().sourceView.selectLines(note.note.path, note.match.start - 3, note.match.end + 3);
-                }
-                project_1.Project.instance().sourceView.renderSelectedLines();
-                _this.removeAll();
-                for (var _a = 0, selected_2 = selected; _a < selected_2.length; _a++) {
-                    var note = selected_2[_a];
-                    _this.renderNote(note);
-                }
-                _this.selectDefault();
+                project_1.Project.instance().searchNotes(search);
+                // this.search(search)
             };
             this.onNoteClick = function (path, key) {
                 var note = _this.notes[path][key];
@@ -91,6 +69,32 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
             this.notesSearch.addEventListener('change', this.onSearch);
             this.notesSearch.addEventListener('paste', this.onSearch);
         }
+        Notes.prototype.search = function (search) {
+            this.searchTerm = search;
+            this.selectedFile = null;
+            var selected = [];
+            for (var path in this.notes) {
+                var notes = this.notes[path];
+                for (var key in notes) {
+                    var note = notes[key];
+                    if (note.note.note.toLowerCase().indexOf(search) !== -1) {
+                        selected.push(note);
+                    }
+                }
+            }
+            project_1.Project.instance().sourceView.search();
+            for (var _i = 0, selected_1 = selected; _i < selected_1.length; _i++) {
+                var note = selected_1[_i];
+                project_1.Project.instance().sourceView.selectLines(note.note.path, note.match.start - 3, note.match.end + 3);
+            }
+            project_1.Project.instance().sourceView.renderSelectedLines();
+            this.removeAll();
+            for (var _a = 0, selected_2 = selected; _a < selected_2.length; _a++) {
+                var note = selected_2[_a];
+                this.renderNote(note);
+            }
+            this.selectDefault();
+        };
         Notes.prototype.selectDefault = function () {
             var _this = this;
             if (this.renderedNotes.length == 0) {

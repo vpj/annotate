@@ -35,6 +35,11 @@ class Notes {
             return
         }
 
+        Project.instance().searchNotes(search)
+        // this.search(search)
+    }
+
+    search(search: string) {
         this.searchTerm = search
         this.selectedFile = null
         let selected: NoteElem[] = []

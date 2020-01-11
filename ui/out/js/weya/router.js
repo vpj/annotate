@@ -76,8 +76,15 @@ define(["require", "exports"], function (require, exports) {
                 return this.event.originalEvent;
         };
         Router.prototype.navigate = function (fragment, options) {
-            if (!options)
-                options = { replace: false, trigger: true, title: '', state: null };
+            var def = { replace: false, trigger: true, title: '', state: null };
+            if (!options) {
+                options = def;
+            }
+            for (var k in def) {
+                if (!(k in options)) {
+                    options[k] = def[k];
+                }
+            }
             if (options.replace) {
                 this.history.pop();
             }
