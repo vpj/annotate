@@ -19,6 +19,19 @@ define(["require", "exports", "./api", "./app", "./source_view", "./source_code"
             this.sourceView = new source_view_1.SourceView(document.getElementById('source_code'), this.onCodeClick, this.onNoteAdd);
             this.notes = new notes_1.Notes(document.getElementById("notes"));
             this.files = new files_1.Files(document.getElementById("files"), this.onFileClick);
+            app_1.ROUTER.route('s/:search', [function (search) {
+                    search = decodeURIComponent(search);
+                    _this.notes.search(search);
+                }]);
+            app_1.ROUTER.route(':path', [function (path) {
+                    path = decodeURIComponent(path);
+                    _this.selected_file = path;
+                    _this.sourceView.selectFile(path);
+                    _this.notes.selectFile(path);
+                }]);
+            app_1.ROUTER.route('', [function (path) {
+                    app_1.ROUTER.navigate(encodeURIComponent(_this.getDefaultFile()));
+                }]);
         }
         Project.instance = function () {
             if (Project._instance == null) {
@@ -27,9 +40,7 @@ define(["require", "exports", "./api", "./app", "./source_view", "./source_code"
             return Project._instance;
         };
         Project.prototype.selectFile = function (path) {
-            this.selected_file = path;
-            this.sourceView.selectFile(path);
-            this.notes.selectFile(path);
+            app_1.ROUTER.navigate(encodeURIComponent(path));
         };
         Project.prototype.load = function () {
             var _this = this;
@@ -74,13 +85,4 @@ define(["require", "exports", "./api", "./app", "./source_view", "./source_code"
         return Project;
     }());
     exports.Project = Project;
-    app_1.ROUTER.route('s/:search', [function (search) {
-            Project.instance().notes.search(search);
-        }]);
-    app_1.ROUTER.route(':path', [function (path) {
-            Project.instance().selectFile(decodeURIComponent(path));
-        }]);
-    app_1.ROUTER.route('', [function (path) {
-            app_1.ROUTER.navigate(encodeURIComponent(Project.instance().getDefaultFile()));
-        }]);
 });

@@ -21,6 +21,22 @@ class Project {
         this.notes = new Notes(document.getElementById("notes"))
         this.files = new Files(document.getElementById("files"),
             this.onFileClick)
+
+        ROUTER.route('s/:search', [(search: string) => {
+            search = decodeURIComponent(search)
+            this.notes.search(search)
+        }])
+
+        ROUTER.route(':path', [(path: string) => {
+            path = decodeURIComponent(path)
+            this.selected_file = path
+            this.sourceView.selectFile(path)
+            this.notes.selectFile(path)
+        }])
+
+        ROUTER.route('', [(path: string) => {
+            ROUTER.navigate(encodeURIComponent(this.getDefaultFile()))
+        }])
     }
 
     static instance() {
@@ -32,9 +48,7 @@ class Project {
     }
 
     selectFile(path: string) {
-        this.selected_file = path
-        this.sourceView.selectFile(path)
-        this.notes.selectFile(path)
+        ROUTER.navigate(encodeURIComponent(path))
     }
 
     load() {
@@ -63,14 +77,14 @@ class Project {
         })
     }
 
-    getDefaultFile() {
+    private getDefaultFile() {
         for (let f in this.files.files) {
             return f
         }
     }
 
     searchNotes(search: string) {
-        ROUTER.navigate(`s/${encodeURIComponent(search)}`, {trigger: false})
+        ROUTER.navigate(`s/${encodeURIComponent(search)}`, { trigger: false })
         this.notes.search(search)
     }
 
@@ -96,16 +110,5 @@ class Project {
     }
 }
 
-ROUTER.route('s/:search', [(search: string) => {
-    Project.instance().notes.search(search)
-}])
-
-ROUTER.route(':path', [(path: string) => {
-    Project.instance().selectFile(decodeURIComponent(path))
-}])
-
-ROUTER.route('', [(path: string) => {
-    ROUTER.navigate(encodeURIComponent(Project.instance().getDefaultFile()))
-}])
 
 export { Project }

@@ -292,7 +292,8 @@ div.note {
 #made_with {
   padding: 50px;
   font-size: 12px;
-  font-style: italic; }
+  font-style: italic;
+  padding-left: 30%; }
   #made_with a {
     color: #ffffff;
     font-weight: bold; }
