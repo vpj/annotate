@@ -201,6 +201,14 @@ class NoteElem {
         this.updateListener(this, false, null, null, null)
     }
 
+    resetTransform() {
+        this.elem.style.transform = null
+    }
+
+    setTransform(y: number) {
+        this.elem.style.transform = `translateY(${y}px)`
+    }
+
     edit() {
         this.elem.classList.add('editing')
         this.editElem.setContent(this.note.note, this.match)

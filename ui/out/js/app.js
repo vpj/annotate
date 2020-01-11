@@ -8,5 +8,5 @@ define(["require", "exports", "./weya/router", "./io/ajax"], function (require, 
         root: '',
         onerror: function (e) { console.error("Error", e); }
     });
-    exports.PORT = new ajax_1.AjaxHttpPort("http", "localhost", 8082, '/api');
+    exports.PORT = new ajax_1.AjaxHttpPort("http", "localhost", 8088, '/api');
 });

@@ -10,4 +10,4 @@ export let ROUTER = new Router({
     onerror: (e) => { console.error("Error", e) }
 })
 
-export let PORT = new AjaxHttpPort("http", "localhost", 8082, '/api')
+export let PORT = new AjaxHttpPort("http", "localhost", 8088, '/api')

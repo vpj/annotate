@@ -249,6 +249,56 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
                 }
             }
         };
+        Notes.prototype.resetTransforms = function () {
+            for (var _i = 0, _a = this.renderedNotes; _i < _a.length; _i++) {
+                var note = _a[_i];
+                note.resetTransform();
+            }
+        };
+        Notes.prototype.getAlignmentTransform = function (note) {
+            if (note.match.start > note.match.end) {
+                return 0.;
+            }
+            var start = note.match.start;
+            // let isFirst = this.renderedNotes[0] === note && this.selected == note
+            var isFirst = this.renderedNotes[0] === this.selected;
+            var path = note.note.path;
+            var y = project_1.Project.instance().sourceView.getY(path, start);
+            var yn = note.getY();
+            var transform = y - yn;
+            if (isFirst)
+                transform -= MARGIN_FIRST;
+            else
+                transform -= MARGIN_OTHER;
+            return transform;
+        };
+        Notes.prototype.align = function (note) {
+            var transform = this.getAlignmentTransform(note);
+            note.setTransform(transform);
+            var idx = this.renderedNotes.length;
+            for (var i = 0; i < this.renderedNotes.length; ++i) {
+                if (this.renderedNotes[i] == note) {
+                    idx = i;
+                    break;
+                }
+            }
+            var prev = transform;
+            for (var i = idx - 1; i >= 0; --i) {
+                var n = this.renderedNotes[i];
+                var t = this.getAlignmentTransform(n);
+                t = Math.min(prev, t);
+                n.setTransform(t);
+                prev = t;
+            }
+            prev = transform;
+            for (var i = idx + 1; i < this.renderedNotes.length; ++i) {
+                var n = this.renderedNotes[i];
+                var t = this.getAlignmentTransform(n);
+                t = Math.max(prev, t);
+                n.setTransform(t);
+                prev = t;
+            }
+        };
         Notes.prototype.select = function (path, key) {
             var _this = this;
             this.clearSelected();
@@ -258,22 +308,17 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
                 project_1.Project.instance().sourceView.setSelected(path, i, true);
             }
             this.selected = note;
-            var start = note.match.start;
-            var isFirst = this.renderedNotes[0] === note;
+            this.resetTransforms();
+            window.requestAnimationFrame(function () {
+                _this.align(note);
+                // let transform = this.getAlignmentTransform(note)
+                // note.setTransform(transform)
+                // this.container.style.transform = `translateY(${transform}px)`
+            });
             if (note.match.start > note.match.end) {
                 return null;
             }
-            window.requestAnimationFrame(function () {
-                var y = project_1.Project.instance().sourceView.getY(path, start);
-                var yn = note.getY();
-                var transform = y - yn;
-                if (isFirst)
-                    transform -= MARGIN_FIRST;
-                else
-                    transform -= MARGIN_OTHER;
-                _this.container.style.transform = "translateY(" + transform + "px)";
-            });
-            return start;
+            return note.match.start;
         };
         Notes.prototype.toJSON = function () {
             var allNotes = {};

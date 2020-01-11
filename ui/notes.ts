@@ -300,6 +300,66 @@ class Notes {
         }
     }
 
+    private resetTransforms() {
+        for(let note of this.renderedNotes) {
+            note.resetTransform()
+        }
+    }
+
+    private getAlignmentTransform(note: NoteElem) {
+        if (note.match.start > note.match.end) {
+            return 0.
+        }
+
+        let start = note.match.start
+        // let isFirst = this.renderedNotes[0] === note && this.selected == note
+        let isFirst = this.renderedNotes[0] === this.selected
+        let path = note.note.path
+
+        let y = Project.instance().sourceView.getY(path, start)
+
+        let yn = note.getY()
+
+        let transform = y - yn
+        if (isFirst)
+            transform -= MARGIN_FIRST
+        else
+            transform -= MARGIN_OTHER
+
+        return transform
+    }
+
+    private align(note: NoteElem) {
+        let transform = this.getAlignmentTransform(note)
+        note.setTransform(transform)
+
+        let idx = this.renderedNotes.length
+        for(let i = 0; i < this.renderedNotes.length; ++i) {
+            if(this.renderedNotes[i] == note) {
+                idx = i
+                break
+            }
+        }
+
+        let prev = transform;
+        for(let i = idx - 1; i >= 0; --i) {
+            let n = this.renderedNotes[i]
+            let t = this.getAlignmentTransform(n)
+            t = Math.min(prev, t)
+            n.setTransform(t)
+            prev = t
+        }
+
+        prev = transform
+        for(let i = idx + 1; i < this.renderedNotes.length; ++i) {
+            let n = this.renderedNotes[i]
+            let t = this.getAlignmentTransform(n)
+            t = Math.max(prev, t)
+            n.setTransform(t)
+            prev = t
+        }
+    }
+
     select(path: string, key: string) {
         this.clearSelected()
 
@@ -309,27 +369,19 @@ class Notes {
             Project.instance().sourceView.setSelected(path, i, true)
         }
         this.selected = note
-        let start = note.match.start
-        let isFirst = this.renderedNotes[0] === note
+        this.resetTransforms()
+
+        window.requestAnimationFrame(() => {
+            this.align(note)
+            // let transform = this.getAlignmentTransform(note)
+            // note.setTransform(transform)
+            // this.container.style.transform = `translateY(${transform}px)`
+        })
 
         if (note.match.start > note.match.end) {
             return null
         }
-
-        window.requestAnimationFrame(() => {
-            let y = Project.instance().sourceView.getY(path, start)
-            let yn = note.getY()
-
-            let transform = y - yn
-            if (isFirst)
-                transform -= MARGIN_FIRST
-            else
-                transform -= MARGIN_OTHER
-
-            this.container.style.transform = `translateY(${transform}px)`
-        })
-
-        return start
+        return note.match.start
     }
 
     toJSON(): { [path: string]: { [key: string]: any }[] } {

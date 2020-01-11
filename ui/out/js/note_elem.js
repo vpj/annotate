@@ -131,6 +131,12 @@ define(["require", "exports", "./markdown", "./util"], function (require, export
                 this.elem.classList.remove('collapsed');
             }
         };
+        NoteElem.prototype.resetTransform = function () {
+            this.elem.style.transform = null;
+        };
+        NoteElem.prototype.setTransform = function (y) {
+            this.elem.style.transform = "translateY(" + y + "px)";
+        };
         NoteElem.prototype.edit = function () {
             this.elem.classList.add('editing');
             this.editElem.setContent(this.note.note, this.match);
