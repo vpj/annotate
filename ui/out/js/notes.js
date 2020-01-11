@@ -8,7 +8,7 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
         function Notes(container) {
             var _this = this;
             this.onSearch = function () {
-                var search = _this.notesSearch.value;
+                var search = _this.searchElem.value;
                 if (search === _this.searchTerm) {
                     return;
                 }
@@ -64,10 +64,10 @@ define(["require", "exports", "./note", "./note_elem", "./project"], function (r
             this.selected = null;
             this.selectedFile = null;
             this.renderedNotes = [];
-            this.notesSearch = document.getElementById('notes_search');
-            this.notesSearch.addEventListener('keyup', this.onSearch);
-            this.notesSearch.addEventListener('change', this.onSearch);
-            this.notesSearch.addEventListener('paste', this.onSearch);
+            this.searchElem = document.getElementById('notes_search');
+            this.searchElem.addEventListener('keyup', this.onSearch);
+            this.searchElem.addEventListener('change', this.onSearch);
+            this.searchElem.addEventListener('paste', this.onSearch);
         }
         Notes.prototype.search = function (search) {
             this.searchTerm = search;

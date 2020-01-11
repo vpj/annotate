@@ -103,38 +103,53 @@ code {
   clear: both; }
 
 .notes_panel {
-  width: 30%;
-  position: relative;
-  min-height: 10px;
-  padding: 0px 25px 1px 25px;
-  color: #ccc;
-  /* overflow: hidden; */ }
-  .notes_panel pre {
-    margin: 15px 0 15px; }
-  .notes_panel p tt,
-  .notes_panel li code,
-  .notes_panel ol code,
-  .notes_panel p code {
-    background: #282a36;
-    border: none;
-    border-radius: 1px;
-    font-size: 12px;
-    padding: 0 0.2em;
-    color: #ccc; }
+  width: 30%; }
 
 .project_panel {
-  width: 20%;
-  min-height: 10px;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  overflow: scroll; }
+  width: 20%; }
 
 .code_panel {
-  width: 50%;
-  position: relative;
-  overflow-x: scroll; }
+  width: 50%; }
+
+.search_row {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0; }
+  .search_row .code_panel #code_search {
+    margin-left: 80px; }
+
+.content_row {
+  margin-top: 30px; }
+  .content_row .notes_panel {
+    position: relative;
+    min-height: 10px;
+    padding: 0px 25px 1px 25px;
+    color: #ccc;
+    /* overflow: hidden; */ }
+    .content_row .notes_panel pre {
+      margin: 15px 0 15px; }
+    .content_row .notes_panel p tt,
+    .content_row .notes_panel li code,
+    .content_row .notes_panel ol code,
+    .content_row .notes_panel p code {
+      background: #282a36;
+      border: none;
+      border-radius: 1px;
+      font-size: 12px;
+      padding: 0 0.2em;
+      color: #ccc; }
+  .content_row .project_panel {
+    min-height: 10px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 30px;
+    overflow: scroll; }
+  .content_row .code_panel {
+    position: relative;
+    overflow-x: scroll; }
 
 #notes {
   position: relative; }

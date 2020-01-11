@@ -126,44 +126,70 @@ code {
 
 .notes_panel {
   width: 30%;
-  position: relative;
-  min-height: 10px;
-  padding: 0px 25px 1px 25px;
-  color: #ccc;
-  /* overflow: hidden; */
-
-  pre {
-    margin: 15px 0 15px;
-  }
-
-  p tt,
-  li code,
-  ol code,
-  p code {
-    background: #282a36;
-    border: none;
-    border-radius: 1px;
-    font-size: 12px;
-    padding: 0 0.2em;
-    color: #ccc;
-  }
 }
 
 .project_panel {
   width: 20%;
-  min-height: 10px;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-
-  overflow: scroll;
 }
 
 .code_panel {
   width: 50%;
-  position: relative;
-  overflow-x: scroll;
+}
+
+.search_row {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  .code_panel {
+      #code_search {
+          margin-left: 80px;
+      }
+  }
+}
+
+.content_row {
+  margin-top: 30px;
+  .notes_panel {
+    position: relative;
+    min-height: 10px;
+    padding: 0px 25px 1px 25px;
+    color: #ccc;
+    /* overflow: hidden; */
+
+    pre {
+      margin: 15px 0 15px;
+    }
+
+    p tt,
+    li code,
+    ol code,
+    p code {
+      background: #282a36;
+      border: none;
+      border-radius: 1px;
+      font-size: 12px;
+      padding: 0 0.2em;
+      color: #ccc;
+    }
+  }
+
+  .project_panel {
+    min-height: 10px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 30px;
+
+    overflow: scroll;
+  }
+
+  .code_panel {
+    position: relative;
+    overflow-x: scroll;
+  }
 }
 
 #notes {
@@ -379,13 +405,13 @@ div.note {
 }
 
 #made_with {
-    padding: 50px;
-    font-size: 12px;
-    font-style: italic;
-    padding-left: 30%;
+  padding: 50px;
+  font-size: 12px;
+  font-style: italic;
+  padding-left: 30%;
 
-    a {
-        color: #ffffff;
-        font-weight: bold;
-    }
+  a {
+    color: #ffffff;
+    font-weight: bold;
+  }
 }

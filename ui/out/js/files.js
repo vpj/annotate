@@ -167,17 +167,16 @@ define(["require", "exports"], function (require, exports) {
         function Files(container, fileClickListener) {
             var _this = this;
             this.onChange = function () {
-                console.log(_this.search.value);
-                _this.top.search(_this.search.value.toLowerCase());
+                console.log(_this.searchElem.value);
+                _this.top.search(_this.searchElem.value.toLowerCase());
             };
             this.container = container;
             this.files = {};
-            this.search = document.createElement('input');
-            this.container.appendChild(this.search);
+            this.searchElem = document.getElementById('files_search');
             this.top = new FolderElem(null, '', '', fileClickListener);
             this.container.appendChild(this.top.elem);
-            this.search.addEventListener('keyup', this.onChange);
-            this.search.addEventListener('paste', this.onChange);
+            this.searchElem.addEventListener('keyup', this.onChange);
+            this.searchElem.addEventListener('paste', this.onChange);
         }
         Files.prototype.updateNotes = function (file, hasNotes) {
             this.files[file].updateNotes(hasNotes);

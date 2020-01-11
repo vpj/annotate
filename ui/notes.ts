@@ -13,7 +13,7 @@ class Notes {
     selected?: NoteElem
     selectedFile?: string
     renderedNotes: NoteElem[]
-    notesSearch: HTMLInputElement
+    searchElem: HTMLInputElement
     searchTerm: string
 
     constructor(container: HTMLElement) {
@@ -23,14 +23,14 @@ class Notes {
         this.selected = null
         this.selectedFile = null
         this.renderedNotes = []
-        this.notesSearch = <HTMLInputElement>document.getElementById('notes_search')
-        this.notesSearch.addEventListener('keyup', this.onSearch)
-        this.notesSearch.addEventListener('change', this.onSearch)
-        this.notesSearch.addEventListener('paste', this.onSearch)
+        this.searchElem = <HTMLInputElement>document.getElementById('notes_search')
+        this.searchElem.addEventListener('keyup', this.onSearch)
+        this.searchElem.addEventListener('change', this.onSearch)
+        this.searchElem.addEventListener('paste', this.onSearch)
     }
 
     onSearch = () => {
-        let search = this.notesSearch.value
+        let search = this.searchElem.value
         if (search === this.searchTerm) {
             return
         }

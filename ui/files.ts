@@ -174,21 +174,20 @@ class FolderElem extends FileFolderElem {
 class Files {
     top: FolderElem
     container: HTMLElement
-    search: HTMLInputElement
+    searchElem: HTMLInputElement
     files: { [path: string]: FileElem }
 
     constructor(container: HTMLElement, fileClickListener: FileClickListener) {
         this.container = container
         this.files = {}
 
-        this.search = document.createElement('input')
-        this.container.appendChild(this.search)
+        this.searchElem = <HTMLInputElement>document.getElementById('files_search')
 
         this.top = new FolderElem(null, '', '', fileClickListener)
         this.container.appendChild(this.top.elem)
 
-        this.search.addEventListener('keyup', this.onChange)
-        this.search.addEventListener('paste', this.onChange)
+        this.searchElem.addEventListener('keyup', this.onChange)
+        this.searchElem.addEventListener('paste', this.onChange)
     }
 
     updateNotes(file: string, hasNotes: boolean) {
@@ -196,8 +195,8 @@ class Files {
     }
 
     onChange = () => {
-        console.log(this.search.value)
-        this.top.search(this.search.value.toLowerCase())
+        console.log(this.searchElem.value)
+        this.top.search(this.searchElem.value.toLowerCase())
     }
 
     load(files: string[]) {
