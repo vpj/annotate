@@ -1,5 +1,7 @@
 {
     "files.exclude": {
-        "out/": true
+        "out/": true,
+        "package-lock.json": true,
+        "node_modules/": true
     }
 }

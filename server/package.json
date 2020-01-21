@@ -4,19 +4,17 @@
   "description": "Server for Annotate",
   "main": "app.js",
   "repository": "https://github.com/vpj/annotate",
-  "author": "VPJ",
+  "author": "Varuna Jayasiri",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^12.12.17",
-    "@types/yaml": "^1.2.0"
+    "@types/node": "latest",
+    "@types/yaml": "latest",
+    "typescript": "latest"
   },
   "dependencies": {},
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc -w",
-    "build:run": "$npm_execpath run build && $npm_execpath run start",
-    "build:clean": "rm -rf out",
-    "start": "node out/app.js",
-    "start:watch": "$npm_execpath run build && $npm_execpath run build:watch & nodemon out/app.js"
+    "build:clean": "rm -rf out"
   }
 }

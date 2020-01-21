@@ -3,3 +3,5 @@
 server/notes.json
 node_modules
 .*.swp
+out/
+package-lock.json
