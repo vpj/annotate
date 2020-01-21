@@ -16,9 +16,29 @@ We intend to use it for  personal note taking to understand code,
 writing [tutorials](http://blog.varunajayasiri.com/ml/transformer.html),
 and for collaboration.
 
-## How to use
+### Clone and install
 
-Run `node server/out/app.js` from the folder with your python source code.
+```bash
+git clone git@github.com:vpj/annotate.git
+cd annotate
+git submodule init
+git submodule update
+./install.sh
+```
 
-Visit `localhost:8088` in the browser.
+To update run a git update
 
+```bash
+cd annotate
+git pull
+git submodule update
+./install.sh
+```
+
+### Starting the server
+
+Navigate to the path of the project and run the following command to start the server.
+
+```bash
+annotate
+```
