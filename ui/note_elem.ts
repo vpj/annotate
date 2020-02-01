@@ -1,7 +1,8 @@
-import { MathJax, MarkDown } from "./markdown"
-import { NoteMatch } from "./source_code"
-import { Note } from "./note"
-import { createIcon } from "./util"
+import {MathJax, MarkDown} from "./markdown"
+import {NoteMatch} from "./source_code"
+import {Note} from "./note"
+import {createIcon} from "./util"
+import {Weya as $, WeyaElement, WeyaElementFunction} from './weya/weya'
 
 interface NoteClickListener {
     (path: string, key: string): void
@@ -24,25 +25,16 @@ class NoteEditElem {
     textArea: HTMLTextAreaElement
 
     constructor(saveListener: NoteListener) {
-        this.elem = document.createElement('div')
-        this.elem.className = 'edit'
+        this.elem = <HTMLDivElement>$('div.edit', $ => {
+                this.start = <HTMLInputElement>$('input', {type: 'number'})
+                this.end = <HTMLInputElement>$('input', {type: 'number'})
 
-        this.start = document.createElement('input')
-        this.start.setAttribute('type', 'number')
-        this.elem.appendChild(this.start)
+                this.textArea = <HTMLTextAreaElement>$('textarea')
 
-        this.end = document.createElement('input')
-        this.end.setAttribute('type', 'number')
-        this.elem.appendChild(this.end)
+                this.button = <HTMLButtonElement>$('button', 'Save', {on: {click: saveListener}})
+            }
+        )
 
-        this.textArea = document.createElement('textarea')
-        this.elem.appendChild(this.textArea)
-
-        this.button = document.createElement('button')
-        this.button.textContent = 'Save'
-        this.elem.appendChild(this.button)
-
-        this.button.addEventListener('click', saveListener)
     }
 
     focusEdit() {
@@ -82,11 +74,13 @@ class NoteViewControls {
     collapse: HTMLElement
     codeCollapse: HTMLElement
     remove: HTMLElement
+    private readonly viewCode: HTMLElement
 
     constructor(editListener: NoteListener,
-        removeListener: NoteListener,
-        collapseListener: NoteListener,
-        codeCollapseListener: NoteListener) {
+                removeListener: NoteListener,
+                collapseListener: NoteListener,
+                codeCollapseListener: NoteListener,
+                viewCodeListener: NoteListener) {
         this.elem = document.createElement('div')
         this.elem.className = 'view_controls'
 
@@ -99,6 +93,11 @@ class NoteViewControls {
         this.codeCollapse.classList.add('collapse_code')
         this.elem.appendChild(this.codeCollapse)
         this.codeCollapse.addEventListener('click', codeCollapseListener)
+
+        this.viewCode = createIcon('code')
+        this.viewCode.classList.add('collapse_code')
+        this.elem.appendChild(this.viewCode)
+        this.viewCode.addEventListener('click', viewCodeListener)
 
         this.edit = createIcon('edit')
         this.edit.classList.add('edit_button')
@@ -114,6 +113,33 @@ class NoteViewControls {
     }
 }
 
+class CodeElem {
+    elem: HTMLDivElement
+    button: HTMLButtonElement
+    start: HTMLInputElement
+    end: HTMLInputElement
+    textArea: HTMLTextAreaElement
+
+    constructor(note: Note) {
+        this.elem = <HTMLDivElement>$('div.node_code', $ => {
+            $('pre', $ => {
+                this.createLines($, '.pre', note.pre)
+                this.createLines($, '.note_code', note.code)
+                this.createLines($, '.post', note.post)
+            })
+        })
+    }
+
+    private createLines($: WeyaElementFunction, className: string, lines: string[]) {
+        $(`div${className}`, $ => {
+            for (let line of lines) {
+                line = line === '' ? ' ' : line
+                $('div.line', line)
+            }
+
+        })
+    }
+}
 
 class NoteElem {
     note: Note
@@ -126,11 +152,12 @@ class NoteElem {
     clickListener: NoteClickListener
     updateListener: NoteUpdateListener
     collapseListener: NoteClickListener
+    private codeElem: CodeElem
 
     constructor(key: string, note: Note, match: NoteMatch,
-        clickListener: NoteClickListener,
-        updateListener: NoteUpdateListener,
-        collapseListener: NoteClickListener) {
+                clickListener: NoteClickListener,
+                updateListener: NoteUpdateListener,
+                collapseListener: NoteClickListener) {
         this.key = key
         this.note = note
         this.match = match
@@ -143,20 +170,23 @@ class NoteElem {
     }
 
     render() {
-        this.elem = document.createElement('div')
-        this.elem.classList.add("note")
+        this.elem = <HTMLDivElement>$('div.note', $ => {
+            this.view = <HTMLDivElement>$('div.view')
+        })
 
-        this.view = document.createElement('div')
         this.viewControls = new NoteViewControls(this.onEdit,
             this.onRemove,
             this.onCollapse,
-            this.onCodeCollapse)
-        this.elem.appendChild(this.view)
+            this.onCodeCollapse,
+            this.onViewCode)
+
         this.elem.appendChild(this.viewControls.elem)
-        this.view.className = 'view'
 
         this.editElem = new NoteEditElem(this.onSave)
         this.elem.appendChild(this.editElem.elem)
+
+        this.codeElem = new CodeElem((this.note))
+        this.elem.appendChild((this.codeElem.elem))
 
         this.view.addEventListener('click', this.onClick)
         this.setCollapseCss()
@@ -174,6 +204,18 @@ class NoteElem {
         return this.elem.classList.contains('editing')
     }
 
+    get isViewCode(): boolean {
+        return this.elem.classList.contains('viewing_code')
+    }
+
+    private onViewCode = () => {
+        if (!this.isViewCode) {
+            this.elem.classList.add('viewing_code')
+        } else {
+            this.elem.classList.remove('viewing_code')
+        }
+    }
+
     private onCodeCollapse = () => {
         this.note.codeCollapsed = !this.note.codeCollapsed
         this.collapseListener(this.note.path, this.key)
@@ -187,6 +229,7 @@ class NoteElem {
 
     private setCollapseCss() {
         if (this.note.collapsed) {
+            this.elem.classList.remove('editing')
             this.elem.classList.add('collapsed')
         } else {
             this.elem.classList.remove('collapsed')
@@ -211,6 +254,7 @@ class NoteElem {
 
     edit() {
         this.elem.classList.add('editing')
+        this.elem.classList.remove('viewing_code')
         this.editElem.setContent(this.note.note, this.match)
         this.editElem.focusEdit()
     }
@@ -227,7 +271,7 @@ class NoteElem {
         const html = MarkDown.render(this.note.note)
         this.view.innerHTML = html
         let scripts = this.view.getElementsByTagName('script')
-        for (let i = 0; i <scripts.length; ++i) {
+        for (let i = 0; i < scripts.length; ++i) {
             let s = scripts[i]
             s.innerText = s.innerHTML.replace(/&amp;/g, '&')
         }
@@ -252,6 +296,7 @@ class NoteElem {
     unselect() {
         this.elem.classList.remove('editing')
         this.elem.classList.remove("selected")
+        this.elem.classList.remove('viewing_code')
     }
 
     setNoteLines(path: string, start: number, end: number) {
@@ -273,4 +318,4 @@ class NoteElem {
     }
 }
 
-export { NoteElem, NoteClickListener }
+export {NoteElem, NoteClickListener}

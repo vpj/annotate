@@ -39,20 +39,11 @@ p {
   margin: 0 0 15px 0;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   margin: 40px 0 15px 0;
 }
 
-h2,
-h3,
-h4,
-h5,
-h6 {
+h2, h3, h4, h5, h6 {
   margin-top: 0;
 }
 
@@ -143,14 +134,15 @@ code {
   right: 0;
 
   .code_panel {
-      #code_search {
-          margin-left: 80px;
-      }
+    #code_search {
+      margin-left: 80px;
+    }
   }
 }
 
 .content_row {
   margin-top: 30px;
+
   .notes_panel {
     position: relative;
     min-height: 10px;
@@ -204,24 +196,29 @@ code {
 div.line {
   &:hover {
     background: rgba(0, 0, 0, 0.9) !important;
+
     > .add_comment {
       visibility: visible;
     }
   }
+
   > .add_comment {
     visibility: hidden;
     cursor: pointer;
     padding: 0 10px 0 10px;
     color: #4caf50;
   }
+
   > .has_comments {
     visibility: hidden;
     cursor: pointer;
   }
+
   > .has_comments_many {
     display: none;
     cursor: pointer;
   }
+
   .path {
     cursor: pointer;
     margin-top: 10px;
@@ -287,9 +284,28 @@ div.note {
   opacity: 0.7;
   background: rgba(0, 0, 0, 0.1);
   position: relative;
+
   > div.edit {
     display: none;
   }
+
+  > div.node_code {
+    display: none;
+    font-size: 11px;
+    color: #aaa;
+    overflow: hidden;
+
+    > pre {
+      > div.pre {
+        color: #777;
+      }
+
+      > div.post {
+        color: #777;
+      }
+    }
+  }
+
   > div.edit > textarea {
     width: 100%;
     height: 250px;
@@ -304,6 +320,7 @@ div.note {
     padding-bottom: 10px;
     text-align: right;
   }
+
   > div.view_controls > i {
     opacity: 0.3;
     cursor: pointer;
@@ -313,6 +330,7 @@ div.note {
   > div.view_controls > i.edit_button {
     color: #2196f3;
   }
+
   > div.view_controls > i.remove_button {
     color: #f44336;
   }
@@ -336,6 +354,7 @@ div.note {
     > div.view_controls {
       display: block;
     }
+
     > div.view:after {
       content: none;
     }
@@ -345,12 +364,20 @@ div.note {
     }
   }
 
-  &.editing > div.edit {
-    display: block;
+  &.editing {
+    > div.edit {
+      display: block;
+    }
+
+    > div.view_controls {
+      display: none;
+    }
   }
 
-  &.editing > div.view_controls {
-    display: none;
+  &.viewing_code {
+    > div.node_code {
+      display: block;
+    }
   }
 
   &.collapsed {
@@ -378,9 +405,11 @@ div.note {
   line-height: 24px;
   font-family: Monaco, Consolas, "Lucida Console", monospace;
   font-size: 12px;
+
   div.folder {
     margin-left: 10px;
     cursor: pointer;
+
     > div.label > span {
       color: #999;
     }
@@ -392,6 +421,7 @@ div.note {
 
   div.label {
     white-space: nowrap;
+
     > i {
       margin-right: 5px;
     }
