@@ -14,7 +14,7 @@
   "dependencies": {},
   "scripts": {
     "build": "tsc",
-    "build:watch": "tsc -w",
+    "watch": "tsc -w",
     "build:clean": "rm -rf out"
   }
 }

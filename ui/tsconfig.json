@@ -1,8 +1,8 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "amd",
-        "sourceMap": false,
-        "outDir": "out/js"
-    }
+  "compilerOptions": {
+    "target": "es5",
+    "module": "amd",
+    "sourceMap": false,
+    "outDir": "out/js"
+  }
 }

@@ -1,11 +1,11 @@
-import { SERVER, STATIC_SERVER } from "./server"
-import { IOResponse, CallPacket, Data } from "./io/io"
-import * as HTTP from "http"
+import {SERVER, STATIC_SERVER} from "./server"
+import {CallPacket, Data, IOResponse} from "./io/io"
 import * as UTIL from "util"
 import * as PROCESS from "process"
 import * as FS from "fs"
+import * as FS2 from "./fs"
 import * as PATH from "path"
-import { AssertionError } from "assert"
+import {AssertionError} from "assert"
 
 const CWD = PROCESS.cwd()
 console.log(`http://localhost:${SERVER.port}`)
@@ -41,8 +41,7 @@ async function getFileList(path: string): Promise<string[]> {
 }
 
 async function readSource(path: string): Promise<string> {
-    let readFile = UTIL.promisify(FS.readFile)
-    return readFile(path, { encoding: 'utf-8' })
+    return await FS2.readFile(path)
 }
 
 async function getSources(): Promise<string> {
@@ -61,20 +60,18 @@ async function getSources(): Promise<string> {
 }
 
 async function getNotes(): Promise<string> {
-    let readFile = UTIL.promisify(FS.readFile)
     try {
-        let contents = await readFile(PATH.join(CWD, 'notes.json'), { encoding: 'utf-8' })
-        return contents
+        return await FS2.readFile(PATH.join(CWD, 'notes.json'))
     } catch (e) {
         return '{}'
     }
 }
 
-STATIC_SERVER.addHandler('/notes.json', async (req: HTTP.IncomingMessage) => {
+STATIC_SERVER.addHandler('/notes.json', async () => {
     return { contentString: await getNotes(), contentType: 'application/json' }
 })
 
-STATIC_SERVER.addHandler('/source.json', async (req: HTTP.IncomingMessage) => {
+STATIC_SERVER.addHandler('/source.json', async () => {
     return { contentString: await getSources(), contentType: 'application/json' }
 })
 
