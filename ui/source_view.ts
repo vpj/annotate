@@ -112,7 +112,8 @@ class SourceView {
             })
             let prev: number = null
 
-            for (let lineNo of lineNos.slice(1)) {
+            // This was using a lineNos.slice(1), not sure why
+            for (let lineNo of lineNos) {
                 let line = this.allLines[path][lineNo]
                 if (prev == null) {
                     line.showPath()
