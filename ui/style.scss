@@ -344,25 +344,6 @@ div.note {
     overflow: hidden;
   }
 
-  &.selected {
-    margin: 30px 0 30px 0;
-    padding: 15px 15px 1px 15px;
-    opacity: 1;
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
-    background: rgba(0, 0, 0, 0.5);
-
-    > div.view_controls {
-      display: block;
-    }
-
-    > div.view:after {
-      content: none;
-    }
-
-    > div.view {
-      max-height: none;
-    }
-  }
 
   &.editing {
     > div.edit {
@@ -397,6 +378,26 @@ div.note {
       box-sizing: border-box;
       left: 0px;
       right: 0;
+    }
+  }
+
+  &.selected {
+    margin: 30px 0 30px 0;
+    padding: 15px 15px 1px 15px;
+    opacity: 1;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.5);
+
+    > div.view_controls {
+      display: block;
+    }
+
+    > div.view:after {
+      content: none;
+    }
+
+    > div.view {
+      max-height: none;
     }
   }
 }

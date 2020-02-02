@@ -216,7 +216,7 @@ class SourceView {
             let l = this.renderedLines[i]
             if(l.collapsedHeader > 0) {
                 y -= l.elem.getBoundingClientRect().height
-            } else if(l.collapsed === 0) {
+            } else if(l.collapsed === 0 || l.isSelected) {
                 y -= height
             }
 

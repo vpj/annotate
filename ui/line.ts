@@ -195,6 +195,10 @@ class LineElem {
         this.elem.classList.remove("selected")
     }
 
+    get isSelected(): boolean {
+        return this.elem.classList.contains('selected')
+    }
+
     setSelected(isSelected: boolean) {
         if (isSelected) {
             this.elem.classList.add("selected")
