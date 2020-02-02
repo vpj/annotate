@@ -327,12 +327,20 @@ div.note {
     padding: 0 10px 0 10px;
   }
 
-  > div.view_controls > i.edit_button {
+  > div.view_controls > i.fa-edit {
     color: #2196f3;
   }
 
-  > div.view_controls > i.remove_button {
+  > div.view_controls > i.fa-trash {
     color: #f44336;
+  }
+
+  > div.view_controls > i.fa-expand-arrows-alt {
+    display: none;
+  }
+
+  > div.view_controls > i.fa-plus-square {
+    display: none;
   }
 
   > div.view_controls > i:hover {
@@ -379,6 +387,26 @@ div.note {
       left: 0px;
       right: 0;
     }
+
+    > div.view_controls > i.fa-compress-arrows-alt {
+      display: none;
+    }
+
+    > div.view_controls > i.fa-expand-arrows-alt {
+      display: inline-block;
+    }
+  }
+
+  &.code_collapsed {
+
+    > div.view_controls > i.fa-minus-square {
+      display: none;
+    }
+
+    > div.view_controls > i.fa-plus-square {
+      display: inline-block;
+    }
+
   }
 
   &.selected {

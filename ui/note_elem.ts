@@ -70,46 +70,34 @@ class NoteEditElem {
 
 class NoteViewControls {
     elem: HTMLDivElement
-    edit: HTMLElement
-    collapse: HTMLElement
-    codeCollapse: HTMLElement
-    remove: HTMLElement
-    private readonly viewCode: HTMLElement
 
     constructor(editListener: NoteListener,
                 removeListener: NoteListener,
                 collapseListener: NoteListener,
                 codeCollapseListener: NoteListener,
                 viewCodeListener: NoteListener) {
-        this.elem = document.createElement('div')
-        this.elem.className = 'view_controls'
+        this.elem = <HTMLDivElement>$('div.view_controls', $ => {
+            $('i.fa.fa-compress-arrows-alt',
+                {on: {click: collapseListener}})
 
-        this.collapse = createIcon('compress-arrows-alt')
-        this.collapse.classList.add('collapse_note')
-        this.elem.appendChild(this.collapse)
-        this.collapse.addEventListener('click', collapseListener)
+            $('i.fa.fa-expand-arrows-alt',
+                {on: {click: collapseListener}})
 
-        this.codeCollapse = createIcon('minus-square')
-        this.codeCollapse.classList.add('collapse_code')
-        this.elem.appendChild(this.codeCollapse)
-        this.codeCollapse.addEventListener('click', codeCollapseListener)
+            $('i.fa.fa-minus-square',
+                {on: {click: codeCollapseListener}})
 
-        this.viewCode = createIcon('code')
-        this.viewCode.classList.add('collapse_code')
-        this.elem.appendChild(this.viewCode)
-        this.viewCode.addEventListener('click', viewCodeListener)
+            $('i.fa.fa-plus-square',
+                {on: {click: codeCollapseListener}})
 
-        this.edit = createIcon('edit')
-        this.edit.classList.add('edit_button')
-        this.elem.appendChild(this.edit)
+            $('i.fa.fa-code',
+                {on: {click: viewCodeListener}})
 
-        this.edit.addEventListener('click', editListener)
+            $('i.fa.fa-edit',
+                {on: {click: editListener}})
 
-        this.remove = createIcon('trash')
-        this.remove.classList.add('remove_button')
-        this.elem.appendChild(this.remove)
-
-        this.remove.addEventListener('click', removeListener)
+            $('i.fa.fa-trash',
+                {on: {click: removeListener}})
+        })
     }
 }
 
@@ -190,6 +178,7 @@ class NoteElem {
 
         this.view.addEventListener('click', this.onClick)
         this.setCollapseCss()
+        this.setCodeCollapseCss()
     }
 
     isRendered(): boolean {
@@ -218,6 +207,7 @@ class NoteElem {
 
     private onCodeCollapse = () => {
         this.note.codeCollapsed = !this.note.codeCollapsed
+        this.setCodeCollapseCss()
         this.collapseListener(this.note.path, this.key)
     }
 
@@ -233,6 +223,15 @@ class NoteElem {
             this.elem.classList.add('collapsed')
         } else {
             this.elem.classList.remove('collapsed')
+        }
+    }
+
+    private setCodeCollapseCss() {
+        if (this.note.codeCollapsed) {
+            this.elem.classList.remove('editing')
+            this.elem.classList.add('code_collapsed')
+        } else {
+            this.elem.classList.remove('code_collapsed')
         }
     }
 
