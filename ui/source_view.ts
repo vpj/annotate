@@ -311,9 +311,10 @@ class SourceView {
         let containerOffset = 0
         while (node != null) {
             containerOffset += node.offsetTop
-            node = node.parentElement
+            node = <HTMLElement>node.offsetParent
         }
-        window.scroll(0, line.getY() + containerOffset - Math.round(offset))
+        let scroll = line.getY() + containerOffset - Math.round(offset)
+        window.scroll(0, scroll)
     }
 
     getCode(path: string, lineNo: number) {

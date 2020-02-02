@@ -3,6 +3,11 @@
     "target": "es5",
     "module": "amd",
     "sourceMap": false,
-    "outDir": "out/js"
+    "outDir": "out/js",
+    "lib": [
+      "dom",
+      "es6",
+      "scripthost"
+    ]
   }
 }

@@ -1,6 +1,6 @@
-import { Note } from "./note"
-import { NoteElem } from "./note_elem"
-import { Project } from "./project"
+import {Note} from "./note"
+import {NoteElem} from "./note_elem"
+import {Project} from "./project"
 
 const PADDING = 5
 const MARGIN_FIRST = 30
@@ -184,7 +184,7 @@ class Notes {
             let lines = selectedLines[path]
             for (let key in notes) {
                 let note = notes[key]
-                if(lines[note.match.start]) {
+                if (lines[note.match.start]) {
                     selected.push(note)
                 }
             }
@@ -205,13 +205,16 @@ class Notes {
         this.selectDefault()
     }
 
-    private onNoteClick = (path: string, key: string) => {
+    private onNoteClick = async (path: string, key: string) => {
         const note = this.notes[path][key]
         if (this.selected === note) {
             this.clearSelected()
         } else {
+            let lineNo = await this.select(path, key)
             let y = note.elem.getBoundingClientRect().top
-            let lineNo = this.select(path, key)
+            // note.elem.style.transform = 'translateY(0px)'
+            // let transformStyle = note.elem.style.transform;
+            // y = parseInt(transformStyle.replace(/[^\d.]/g, ''))
             if (lineNo != null) {
                 Project.instance().sourceView.scroll(path, lineNo, y)
             }
@@ -408,7 +411,7 @@ class Notes {
         }
     }
 
-    select(path: string, key: string) {
+    select(path: string, key: string): Promise<number> {
         this.clearSelected()
 
         let note = this.notes[path][key]
@@ -419,17 +422,19 @@ class Notes {
         this.selected = note
         this.resetTransforms()
 
-        window.requestAnimationFrame(() => {
-            this.align(note)
-            // let transform = this.getAlignmentTransform(note)
-            // note.setTransform(transform)
-            // this.container.style.transform = `translateY(${transform}px)`
-        })
 
-        if (note.match.start > note.match.end) {
-            return null
-        }
-        return note.match.start
+        return new Promise((resolve, reject) => {
+            window.requestAnimationFrame(() => {
+                this.align(note)
+                // let transform = this.getAlignmentTransform(note)
+                // note.setTransform(transform)
+                // this.container.style.transform = `translateY(${transform}px)`
+                if (note.match.start > note.match.end) {
+                    resolve(null)
+                }
+                resolve(note.match.start)
+            })
+        })
     }
 
     toJSON(): { [path: string]: { [key: string]: any }[] } {
@@ -447,4 +452,4 @@ class Notes {
     }
 }
 
-export { Notes }
+export {Notes}
