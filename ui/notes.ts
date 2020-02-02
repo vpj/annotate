@@ -15,6 +15,7 @@ class Notes {
     renderedNotes: NoteElem[]
     searchElem: HTMLInputElement
     searchTerm: string
+    private state: number;
 
     constructor(container: HTMLElement) {
         this.notes = {}
@@ -27,6 +28,8 @@ class Notes {
         this.searchElem.addEventListener('keyup', this.onSearch)
         this.searchElem.addEventListener('change', this.onSearch)
         this.searchElem.addEventListener('paste', this.onSearch)
+
+        this.state = 0
     }
 
     onSearch = () => {
@@ -74,32 +77,38 @@ class Notes {
         let note: NoteElem = null
         let collapsedNote: NoteElem = null
 
-        for(let n of this.renderedNotes) {
-            if(n.note.collapsed > 0 || n.note.codeCollapsed > 0) {
-                if(collapsedNote == null) {
+        for (let n of this.renderedNotes) {
+            if (n.note.collapsed || n.note.codeCollapsed) {
+                if (collapsedNote == null) {
                     collapsedNote = n
                 }
             } else {
-                if(note == null) {
+                if (note == null) {
                     note = n
                 }
             }
         }
 
-        if(note == null) {
+        if (note == null) {
             note = collapsedNote
         }
 
-        if(note == null) {
+        if (note == null) {
             return
         }
 
+        let state = this.state
+
         window.requestAnimationFrame(() => {
+            if (state !== this.state) {
+                return
+            }
             let _ = this.select(note.note.path, note.key)
         })
     }
 
     private renderNote(note: NoteElem) {
+        this.state++
         note.render()
         let nextNoteIdx = null
         const match = note.match
@@ -440,15 +449,20 @@ class Notes {
         this.selected = note
         this.resetTransforms()
 
+        let state = this.state
 
         return new Promise((resolve, reject) => {
             window.requestAnimationFrame(() => {
+                if (this.state !== state) {
+                    return resolve(null)
+                }
+
                 this.align(note)
                 // let transform = this.getAlignmentTransform(note)
                 // note.setTransform(transform)
                 // this.container.style.transform = `translateY(${transform}px)`
                 if (note.match.start > note.match.end) {
-                    resolve(null)
+                    return resolve(null)
                 }
                 resolve(note.match.start)
             })
