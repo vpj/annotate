@@ -1,5 +1,5 @@
-import { Weya as $, WeyaElement } from "./weya/weya"
-import { Project } from "./project"
+import {Weya as $, WeyaElement} from "./weya/weya"
+import {Project} from "./project"
 
 interface LineClickListener {
     (path: string, lineNo: number): void
@@ -17,7 +17,7 @@ class LineElem {
 
     elem?: HTMLDivElement
     lineNoElem: WeyaElement
-    codeElem: WeyaElement
+    codeElem: HTMLElement
     addCommentIcon: WeyaElement
     hasComments: WeyaElement
     hasCommentsMany: WeyaElement
@@ -61,7 +61,7 @@ class LineElem {
         this.rank = rank
         this.elem = <HTMLDivElement>$('div.line', $ => {
             if (this.isShowPath) {
-                $('div.path', this.path, { on: { 'click': this.onSelectFile } })
+                $('div.path', this.path, {on: {'click': this.onSelectFile}})
             }
             if (this.isShowBreakBefore) {
                 $('div', '...')
@@ -69,7 +69,7 @@ class LineElem {
             this.isShowBreakBefore = false
             this.isShowPath = false
 
-            this.addCommentIcon = $('i.fas.fa-plus.add_comment', { on: { 'click': this.onAddCommentClick } })
+            this.addCommentIcon = $('i.fas.fa-plus.add_comment', {on: {'click': this.onAddCommentClick}})
 
             this.hasComments = $('i.fas.fa-comment.has_comments')
             this.hasCommentsMany = $('i.fas.fa-comments.has_comments_many')
@@ -220,4 +220,4 @@ class LineElem {
     }
 }
 
-export { LineElem, LineClickListener, NoteAddListener }
+export {LineElem, LineClickListener, NoteAddListener}

@@ -1,7 +1,7 @@
-import { LineElem, LineClickListener, NoteAddListener } from "./line"
-import { getLanguage } from "./util"
-import { highlight } from "./hljs"
-import { Project } from "./project"
+import {LineElem, LineClickListener, NoteAddListener} from "./line"
+import {getLanguage} from "./util"
+import {highlight} from "./hljs"
+import {Project} from "./project"
 
 class SourceView {
     renderedLines: LineElem[]
@@ -57,9 +57,9 @@ class SourceView {
 
         this.search()
 
-        for(let path in this.allLines) {
+        for (let path in this.allLines) {
             let lines = this.allLines[path]
-            for(let i = 0; i < lines.length; ++i) {
+            for (let i = 0; i < lines.length; ++i) {
                 if (lines[i].code.toLowerCase().indexOf(search) !== -1) {
                     this.selectLines(path, Math.max(0, i - 2), Math.min(lines.length - 1, i + 2))
                 }
@@ -107,7 +107,9 @@ class SourceView {
                 lineNos.push(parseInt(lineNo))
             }
 
-            lineNos.sort((x, y) => { return x - y })
+            lineNos.sort((x, y) => {
+                return x - y
+            })
             let prev: number = null
 
             for (let lineNo of lineNos.slice(1)) {
@@ -201,6 +203,36 @@ class SourceView {
         return this.allLines[path][lineNo].rank
     }
 
+    private getLineNo(y: number) {
+        let line = this.renderedLines[0]
+
+        // console.log(x, y)
+
+        let height = line.lineNoElem.getBoundingClientRect().height
+
+        // console.log(height, margin)
+
+        for(let i = 0; i < this.renderedLines.length; ++i) {
+            let l = this.renderedLines[i]
+            if(l.collapsedHeader > 0) {
+                y -= l.elem.getBoundingClientRect().height
+            } else if(l.collapsed === 0) {
+                y -= height
+            }
+
+            if(y < 0) {
+                return i
+            }
+        }
+
+        return Math.floor(y / height)
+    }
+
+    private getMarginLeft(): number {
+        return this.renderedLines[0].codeElem.getBoundingClientRect().left -
+            this.container.getBoundingClientRect().left
+    }
+
     onUserSelect(x: number, y: number, event: string) {
         if (this.renderedLines.length == 0)
             return
@@ -208,17 +240,10 @@ class SourceView {
         x -= this.container.getBoundingClientRect().left
         y -= this.container.getBoundingClientRect().top
 
-        let line = this.renderedLines[0]
-
         // console.log(x, y)
+        let margin = this.getMarginLeft()
 
-        let height = line.elem.getBoundingClientRect().height
-        let margin = line.codeElem.getBoundingClientRect().left -
-            this.container.getBoundingClientRect().left
-
-        // console.log(height, margin)
-
-        let lineNo = Math.floor(y / height)
+        let lineNo = this.getLineNo(y)
 
         if (event == 'start') {
             if (x >= margin) {
@@ -329,4 +354,4 @@ class SourceView {
 }
 
 
-export { SourceView }
+export {SourceView}
