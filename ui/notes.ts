@@ -58,19 +58,7 @@ class Notes {
 
         Project.instance().sourceView.search()
 
-        for (const note of selected) {
-            Project.instance().sourceView.selectLines(note.note.path,
-                note.match.start - 3, note.match.end + 3)
-        }
-
-        Project.instance().sourceView.renderSelectedLines()
-
-        this.removeAll()
-        for (const note of selected) {
-            this.renderNote(note)
-        }
-
-        this.selectDefault()
+        this.renderSelectedLines(selected)
     }
 
     private selectDefault() {
@@ -99,11 +87,11 @@ class Notes {
 
         let state = this.state
 
-        window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(async () => {
             if (state !== this.state) {
                 return
             }
-            let _ = this.select(note.note.path, note.key)
+            await this.select(note.note.path, note.key);
         })
     }
 
@@ -217,6 +205,10 @@ class Notes {
             }
         }
 
+        this.renderSelectedLines(selected)
+    }
+
+    private renderSelectedLines(selected: NoteElem[]) {
         for (const note of selected) {
             Project.instance().sourceView.selectLines(note.note.path,
                 note.match.start - 3, note.match.end + 3)
@@ -230,6 +222,7 @@ class Notes {
         }
 
         this.selectDefault()
+
     }
 
     private onNoteClick = async (path: string, key: string) => {
@@ -285,7 +278,8 @@ class Notes {
             if (content != null && content.trim() != '') {
                 let newNote = this.create(note.note.path, content, start, end,
                     note.note.toJSON())
-                this.select(newNote.note.path, newNote.key)
+                this.select(newNote.note.path, newNote.key).then(() => {
+                })
             }
         }
 
@@ -344,7 +338,8 @@ class Notes {
 
     newNote(path: string, start: number, end: number) {
         let noteElem = this.create(path, '', start, end, {})
-        this.select(path, noteElem.key)
+        this.select(path, noteElem.key).then(() => {
+        })
         noteElem.edit()
     }
 
@@ -358,10 +353,10 @@ class Notes {
     }
 
     moveToLine(path: string, lineNo: number) {
-        for (let k in Project.instance().sourceView.getCommentKeys(path, lineNo)) {
-            this.select(path, k)
-            break
-        }
+        const commentKeys = Project.instance().sourceView.getCommentKeys(path, lineNo)
+        const key = commentKeys.keys()[0]
+        this.select(path, key).then(() => {
+        })
     }
 
     clearSelected() {
@@ -451,7 +446,7 @@ class Notes {
 
         let state = this.state
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             window.requestAnimationFrame(() => {
                 if (this.state !== state) {
                     return resolve(null)

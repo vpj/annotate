@@ -32,7 +32,7 @@ class LineElem {
     rank: number
     isShowPath: boolean
     isShowBreakBefore: boolean
-    commentKeys: { [key: string]: boolean }
+    private readonly commentKeys: Set<string>
     highlighted: string
 
     constructor(path: string, lineNo: number, code: string, highlighted: string, language: string, clickListener: LineClickListener, addListener: NoteAddListener) {
@@ -54,8 +54,9 @@ class LineElem {
         this.rank = 0
         this.isShowBreakBefore = false
         this.isShowPath = false
-        this.commentKeys = {}
+        this.commentKeys = new Set()
     }
+
 
     render(rank: number) {
         this.rank = rank
@@ -64,7 +65,7 @@ class LineElem {
                 $('div.path', this.path, {on: {'click': this.onSelectFile}})
             }
             if (this.isShowBreakBefore) {
-                $('div', '...')
+                $('div', '...', {})
             }
             this.isShowBreakBefore = false
             this.isShowPath = false
@@ -137,16 +138,16 @@ class LineElem {
     }
 
     addComment(key: string) {
-        if (this.commentKeys[key] == null) {
-            this.commentKeys[key] = true
+        if (!this.commentKeys.has(key)) {
+            this.commentKeys.add(key)
             this.comments++
         }
         this.setCommentsCss()
     }
 
     removeComment(key: string) {
-        if (this.commentKeys[key] != null) {
-            delete this.commentKeys[key]
+        if (this.commentKeys.has(key)) {
+            this.commentKeys.delete(key)
             this.comments--
         }
         this.setCommentsCss()

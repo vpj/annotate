@@ -307,7 +307,7 @@ class SourceView {
         this.allLines[path][lineNo].removeComment(key)
     }
 
-    getCommentKeys(path: string, lineNo: number): { [key: string]: boolean } {
+    getCommentKeys(path: string, lineNo: number): Set<string> {
         return this.allLines[path][lineNo].getCommentKeys()
     }
 
