@@ -39,7 +39,6 @@ class Notes {
         }
 
         Project.instance().searchNotes(search)
-        // this.search(search)
     }
 
     search(search: string) {
@@ -56,7 +55,7 @@ class Notes {
             }
         }
 
-        Project.instance().sourceView.search()
+        Project.instance().sourceView.searchMode()
 
         this.renderSelectedLines(selected)
     }
@@ -170,6 +169,8 @@ class Notes {
     }
 
     private removeAll() {
+        this.state++
+
         for (const n of this.renderedNotes) {
             n.remove()
         }

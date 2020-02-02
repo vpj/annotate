@@ -1,9 +1,9 @@
-import { api } from "./api"
-import { PORT, ROUTER } from "./app"
-import { SourceView } from "./source_view"
-import { SourceCodeMatcher } from "./source_code"
-import { Notes } from "./notes"
-import { Files } from "./files"
+import {api} from "./api"
+import {PORT, ROUTER} from "./app"
+import {SourceView} from "./source_view"
+import {SourceCodeMatcher} from "./source_code"
+import {Notes} from "./notes"
+import {Files} from "./files"
 
 class Project {
     sourceView: SourceView
@@ -27,6 +27,11 @@ class Project {
             this.notes.search(search)
         }])
 
+        ROUTER.route('c/:search', [(search: string) => {
+            search = decodeURIComponent(search)
+            this.sourceView.search(search)
+        }])
+
         ROUTER.route(':path', [(path: string) => {
             path = decodeURIComponent(path)
             this.selected_file = path
@@ -34,7 +39,7 @@ class Project {
             this.notes.selectFile(path)
         }])
 
-        ROUTER.route('', [(path: string) => {
+        ROUTER.route('', [() => {
             ROUTER.navigate(encodeURIComponent(this.getDefaultFile()))
         }])
     }
@@ -78,14 +83,17 @@ class Project {
     }
 
     private getDefaultFile() {
-        for (let f in this.files.files) {
-            return f
-        }
+        return Object.keys(this.files.files)[0]
     }
 
     searchNotes(search: string) {
-        ROUTER.navigate(`s/${encodeURIComponent(search)}`, { trigger: false })
+        ROUTER.navigate(`s/${encodeURIComponent(search)}`, {trigger: false})
         this.notes.search(search)
+    }
+
+    searchCode(search: string) {
+        ROUTER.navigate(`c/${encodeURIComponent(search)}`, {trigger: false})
+        this.sourceView.search(search)
     }
 
     private onFileClick = (file: string) => {
@@ -111,4 +119,4 @@ class Project {
 }
 
 
-export { Project }
+export {Project}

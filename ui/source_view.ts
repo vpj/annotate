@@ -55,7 +55,11 @@ class SourceView {
             return
         }
 
-        this.search()
+        Project.instance().searchCode(search)
+    }
+
+    search(search: string) {
+        this.searchMode()
 
         for (let path in this.allLines) {
             let lines = this.allLines[path]
@@ -79,7 +83,7 @@ class SourceView {
         this.renderedLines = []
     }
 
-    search() {
+    searchMode() {
         this.selectedFile = null
         this.selectedLines = {}
         this.removeAll()
@@ -213,15 +217,15 @@ class SourceView {
 
         // console.log(height, margin)
 
-        for(let i = 0; i < this.renderedLines.length; ++i) {
+        for (let i = 0; i < this.renderedLines.length; ++i) {
             let l = this.renderedLines[i]
-            if(l.collapsedHeader > 0) {
+            if (l.collapsedHeader > 0) {
                 y -= l.elem.getBoundingClientRect().height
-            } else if(l.collapsed === 0 || l.isSelected) {
+            } else if (l.collapsed === 0 || l.isSelected) {
                 y -= height
             }
 
-            if(y < 0) {
+            if (y < 0) {
                 return i
             }
         }
