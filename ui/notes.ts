@@ -71,13 +71,31 @@ class Notes {
     }
 
     private selectDefault() {
-        if (this.renderedNotes.length == 0) {
+        let note: NoteElem = null
+        let collapsedNote: NoteElem = null
+
+        for(let n of this.renderedNotes) {
+            if(n.note.collapsed > 0 || n.note.codeCollapsed > 0) {
+                if(collapsedNote == null) {
+                    collapsedNote = n
+                }
+            } else {
+                if(note == null) {
+                    note = n
+                }
+            }
+        }
+
+        if(note == null) {
+            note = collapsedNote
+        }
+
+        if(note == null) {
             return
         }
 
-        let note = this.renderedNotes[0]
         window.requestAnimationFrame(() => {
-            this.select(note.note.path, note.key)
+            let _ = this.select(note.note.path, note.key)
         })
     }
 
