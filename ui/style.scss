@@ -132,6 +132,10 @@ code {
   top: 0;
   left: 0;
   right: 0;
+  z-index: 1000;
+  padding-top: 3px;
+  padding-bottom: 6px;
+  background: #282c34;
 
   .code_panel {
     #code_search {
@@ -141,7 +145,7 @@ code {
 }
 
 .content_row {
-  margin-top: 30px;
+  margin-top: 40px;
 
   .notes_panel {
     position: relative;
