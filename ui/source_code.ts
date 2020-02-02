@@ -1,12 +1,16 @@
-import { Note } from "./note"
+import {Note} from "./note"
 
 class NoteMatch {
-    start: number
-    end: number
+    readonly start: number
+    readonly end: number
+    readonly score: number
+    readonly codeScore: number
 
-    constructor(start: number, end: number) {
+    constructor(start: number, end: number, codeScore: number, score: number) {
         this.start = start
         this.end = end
+        this.score = score
+        this.codeScore = codeScore
     }
 }
 
@@ -57,9 +61,9 @@ class FileSourceCodeMatcher {
 
     private getBestMatch(matches: number[][], weights: number[]) {
         // TODO: Optimize, use a hash table with only the matching lines
-        let reward: { [line: number]: number }[] = [{ 0: 0 }]
-        let parent: { [line: number]: number }[] = [{ 0: -1 }]
-        let isUsed: { [line: number]: boolean }[] = [{ 0: false }]
+        let reward: { [line: number]: number }[] = [{0: 0}]
+        let parent: { [line: number]: number }[] = [{0: -1}]
+        let isUsed: { [line: number]: boolean }[] = [{0: false}]
 
         for (let i = 0; i < matches.length; ++i) {
             reward.push({})
@@ -162,21 +166,36 @@ class FileSourceCodeMatcher {
         let match = this.getBestMatch(matches, weights)
         let start = 1e10
         let end = -1
+        let matchWeight = 0
+        let totanWeight = 0
+        let codeMatchWeight = 0
+        let codeTotalWeight = 0
 
         for (let i = 0; i < matches.length; ++i) {
-            if (weights[i] >= 1.0 && match[i] != -1) {
+            if (match[i] !== -1) {
+                matchWeight += weights[i]
+                if (weights[i] >= 1) {
+                    codeMatchWeight += 1
+                }
+            }
+            if (weights[i] >= 1) {
+                codeTotalWeight += 1
+            }
+            totanWeight += weights[i]
+
+            if (weights[i] >= 1.0 && match[i] !== -1) {
                 let line = this.actualLineNumbers[match[i]]
                 start = Math.min(start, line)
                 end = Math.max(end, line)
             }
         }
 
-        return new NoteMatch(start, end)
+        return new NoteMatch(start, end, codeMatchWeight / codeTotalWeight, matchWeight / totanWeight)
     }
 }
 
 class SourceCodeMatcher {
-    private files: { [path: string]: FileSourceCodeMatcher }
+    private readonly files: { [path: string]: FileSourceCodeMatcher }
 
     constructor() {
         this.files = {}
@@ -193,4 +212,4 @@ class SourceCodeMatcher {
     }
 }
 
-export { NoteMatch, SourceCodeMatcher }
+export {NoteMatch, SourceCodeMatcher}

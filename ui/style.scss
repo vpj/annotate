@@ -285,6 +285,14 @@ div.note {
   background: rgba(0, 0, 0, 0.1);
   position: relative;
 
+  &.mismatch {
+    border-right: 5px solid orange;
+  }
+
+  &.code_mismatch {
+    border-right: 5px solid red;
+  }
+
   > div.edit {
     display: none;
   }

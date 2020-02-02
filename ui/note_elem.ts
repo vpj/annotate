@@ -162,6 +162,12 @@ class NoteElem {
             this.view = <HTMLDivElement>$('div.view')
         })
 
+        if (this.match.codeScore < 1) {
+            this.elem.classList.add('code_mismatch')
+        } else if (this.match.score < 1) {
+            this.elem.classList.add('mismatch')
+        }
+
         this.viewControls = new NoteViewControls(this.onEdit,
             this.onRemove,
             this.onCollapse,
@@ -251,11 +257,13 @@ class NoteElem {
         this.elem.style.transform = `translateY(${y}px)`
     }
 
-    edit() {
+    edit(isFocus: boolean = true) {
         this.elem.classList.add('editing')
         this.elem.classList.remove('viewing_code')
         this.editElem.setContent(this.note.note, this.match)
-        this.editElem.focusEdit()
+        if (isFocus) {
+            this.editElem.focusEdit()
+        }
     }
 
     private onSave = () => {
@@ -290,6 +298,9 @@ class NoteElem {
 
     select() {
         this.elem.classList.add("selected")
+        if (this.match.score < 1) {
+            this.edit(false)
+        }
     }
 
     unselect() {
