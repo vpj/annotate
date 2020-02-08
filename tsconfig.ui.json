@@ -3,11 +3,18 @@
     "target": "es5",
     "module": "amd",
     "sourceMap": false,
-    "outDir": "out/js",
+    "outDir": "dist/ui/js",
     "lib": [
       "dom",
       "es6",
       "scripthost"
     ]
-  }
+  },
+  "include": [
+    "ui",
+    "lib/io/io.ts",
+    "lib/io/ajax.ts",
+    "lib/weya/weya.ts",
+    "lib/weya/router.ts"
+  ]
 }

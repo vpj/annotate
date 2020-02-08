@@ -2,7 +2,7 @@ import {MathJax, MarkDown} from "./markdown"
 import {NoteMatch} from "./source_code"
 import {Note} from "./note"
 import {createIcon} from "./util"
-import {Weya as $, WeyaElement, WeyaElementFunction} from './weya/weya'
+import {Weya as $, WeyaElement, WeyaElementFunction} from '../lib/weya/weya'
 
 interface NoteClickListener {
     (path: string, key: string): void

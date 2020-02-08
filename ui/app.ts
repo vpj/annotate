@@ -1,5 +1,5 @@
-import { Router } from "./weya/router"
-import { AjaxHttpPort } from "./io/ajax"
+import { Router } from "../lib/weya/router"
+import { AjaxHttpPort } from "../lib/io/ajax"
 
 
 export let ROUTER = new Router({

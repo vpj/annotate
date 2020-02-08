@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "sourceMap": false,
+    "outDir": "dist/server"
+  },
+  "include": [
+    "server",
+    "lib/io/io.ts",
+    "lib/io/node.ts",
+    "lib/io/static.ts"
+  ]
+}

@@ -1,5 +1,5 @@
 import {SERVER, STATIC_SERVER} from "./server"
-import {CallPacket, Data, IOResponse} from "./io/io"
+import {CallPacket, Data, IOResponse} from "../lib/io/io"
 import * as UTIL from "util"
 import * as PROCESS from "process"
 import * as FS from "fs"

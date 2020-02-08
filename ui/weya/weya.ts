@@ -1,1 +1,0 @@
-../../lib/weya/weya.ts
