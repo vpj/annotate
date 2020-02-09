@@ -1,10 +1,11 @@
 .DS_Store
-server/notes.json
-node_modules
+notes.json
+node_modules/
 .*.swp
 package-lock.json
 __pycache__
 *.egg-info/
+.sass-cache/
 dist/
 .idea/*
 !.idea/dictionaries
