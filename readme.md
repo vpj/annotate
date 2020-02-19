@@ -42,3 +42,7 @@ Navigate to the path of the project and run the following command to start the s
 ```bash
 annotate
 ```
+
+### Example
+
+[Annotation of Lab sample](http://blog.varunajayasiri.com/ml/lab3/#samples%2Fmnist_loop.py)
