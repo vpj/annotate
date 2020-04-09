@@ -355,8 +355,10 @@ class SourceView {
     addNote(path: string, start: number, end: number) {
         let s = window.scrollY
         this.noteAddListener(path, start, end)
-        window.scroll(0, s)
-        console.log('scrolled', s, window.scrollY)
+        window.requestAnimationFrame(() => {
+            window.scroll(0, s)
+            console.log('scrolled', s, window.scrollY)
+        })
     }
 
     onLineNoteAdd = (path: string, start: number, end: number) => {
