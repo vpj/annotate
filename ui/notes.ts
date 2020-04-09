@@ -355,7 +355,7 @@ class Notes {
 
     moveToLine(path: string, lineNo: number) {
         const commentKeys = Project.instance().sourceView.getCommentKeys(path, lineNo)
-        const key = commentKeys.keys()[0]
+        const key = commentKeys.keys().next().value
         this.select(path, key).then(() => {
         })
     }
