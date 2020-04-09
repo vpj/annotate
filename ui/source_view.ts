@@ -151,7 +151,7 @@ class SourceView {
             this.allLines[path] = []
             const language = getLanguage(path)
             let highlightedLines: string[]
-            if(language !== 'text') {
+            if (language !== 'text') {
                 let h = highlight(language, lines.join("\n"), true, null)
                 highlightedLines = h.value.split('\n')
             } else {
@@ -177,7 +177,7 @@ class SourceView {
                 let elem = new LineElem(path, i, lines[i], hu,
                     language,
                     this.lineClickListener,
-                    this.noteAddListener)
+                    this.onLineNoteAdd)
 
                 let p = 0
                 for (let j = 0; true; ++j) {
@@ -282,7 +282,7 @@ class SourceView {
             let f = Math.min(this.userSelection.start, this.userSelection.end)
             let t = Math.max(this.userSelection.start, this.userSelection.end)
             if (f != t) {
-                this.noteAddListener(this.selectedFile, f, t)
+                this.addNote(this.selectedFile, f, t)
             }
             this.clearUserSelection()
         }
@@ -350,6 +350,17 @@ class SourceView {
         }
         let scroll = line.getY() + containerOffset - Math.round(offset)
         window.scroll(0, scroll)
+    }
+
+    addNote(path: string, start: number, end: number) {
+        let s = window.scrollY
+        this.noteAddListener(path, start, end)
+        window.scroll(0, s)
+        console.log('scrolled', s, window.scrollY)
+    }
+
+    onLineNoteAdd = (path: string, start: number, end: number) => {
+        this.addNote(path, start, end)
     }
 
     getCode(path: string, lineNo: number) {
