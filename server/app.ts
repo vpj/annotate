@@ -26,11 +26,8 @@ async function getFileList(path: string, ignore: Matcher[]): Promise<string[]> {
     const files = await readdir(path)
     let sourceFiles = []
 
-    // console.log(files)
-
     for (let f of files) {
         let file_path = PATH.join(path, f)
-        // console.log(file_path)
         let isIgnore = false
         for(let m of ignore) {
             if(m(f)) {
@@ -39,7 +36,6 @@ async function getFileList(path: string, ignore: Matcher[]): Promise<string[]> {
             }
         }
         if(isIgnore) {
-            // console.log('ignore', file_path)
             continue
         }
         if ((await stat(file_path)).isDirectory()) {
@@ -60,7 +56,6 @@ async function getIgnore(path: string): Promise<Matcher[]> {
     try {
         let ignore = await FS2.readFile(path)
         let lines = ignore.split('\n')
-        console.log(lines)
         let patterns: Matcher[] = []
         for (let l of lines) {
             l = l.trim()
@@ -70,7 +65,6 @@ async function getIgnore(path: string): Promise<Matcher[]> {
             if (l[0] === '#') {
                 continue
             }
-            console.log('g', l)
             patterns.push(PICO_MATCH(l))
         }
 
@@ -82,7 +76,6 @@ async function getIgnore(path: string): Promise<Matcher[]> {
 
 async function getSources(): Promise<string> {
     let ignore = await getIgnore(PATH.join(CWD, '.annotateignore'))
-    console.log('ignoreing', ignore)
     let files = await getFileList(CWD, ignore)
     let promises = files.map((f) => readSource(f))
     let code = await Promise.all(promises)
