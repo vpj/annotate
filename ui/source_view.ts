@@ -150,8 +150,13 @@ class SourceView {
             const lines = files[path]
             this.allLines[path] = []
             const language = getLanguage(path)
-            let h = highlight(language, lines.join("\n"), true, null)
-            let highlightedLines: string[] = h.value.split('\n')
+            let highlightedLines: string[]
+            if(language !== 'text') {
+                let h = highlight(language, lines.join("\n"), true, null)
+                highlightedLines = h.value.split('\n')
+            } else {
+                highlightedLines = lines.join('\n').split('\n')
+            }
             if (lines.length === 0) {
                 highlightedLines = []
             }

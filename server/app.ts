@@ -6,15 +6,19 @@ import * as FS from "fs"
 import * as FS2 from "./fs"
 import * as PATH from "path"
 import {AssertionError} from "assert"
+import * as PICO_MATCH from "picomatch"
 
 const CWD = PROCESS.cwd()
 console.log(`http://localhost:${SERVER.port}`)
 console.log(CWD)
-let EXTENSIONS = new Set(['.py'])
 
-async function getFileList(path: string): Promise<string[]> {
-    let lstat = UTIL.promisify(FS.lstat)
-    if (!(await lstat(path)).isDirectory()) {
+interface Matcher {
+    (string): boolean
+}
+
+async function getFileList(path: string, ignore: Matcher[]): Promise<string[]> {
+    let stat = UTIL.promisify(FS.stat)
+    if (!(await stat(path)).isDirectory()) {
         throw new AssertionError()
     }
 
@@ -26,14 +30,22 @@ async function getFileList(path: string): Promise<string[]> {
 
     for (let f of files) {
         let file_path = PATH.join(path, f)
-        if ((await lstat(file_path)).isDirectory()) {
-            sourceFiles = sourceFiles.concat(await getFileList(file_path))
-        } else {
-            let ext = PATH.extname(file_path)
-
-            if (EXTENSIONS.has(ext)) {
-                sourceFiles.push(file_path)
+        // console.log(file_path)
+        let isIgnore = false
+        for(let m of ignore) {
+            if(m(f)) {
+                isIgnore = true
+                break
             }
+        }
+        if(isIgnore) {
+            // console.log('ignore', file_path)
+            continue
+        }
+        if ((await stat(file_path)).isDirectory()) {
+            sourceFiles = sourceFiles.concat(await getFileList(file_path, ignore))
+        } else {
+            sourceFiles.push(file_path)
         }
     }
 
@@ -44,8 +56,34 @@ async function readSource(path: string): Promise<string> {
     return await FS2.readFile(path)
 }
 
+async function getIgnore(path: string): Promise<Matcher[]> {
+    try {
+        let ignore = await FS2.readFile(path)
+        let lines = ignore.split('\n')
+        console.log(lines)
+        let patterns: Matcher[] = []
+        for (let l of lines) {
+            l = l.trim()
+            if (l.length === 0) {
+                continue
+            }
+            if (l[0] === '#') {
+                continue
+            }
+            console.log('g', l)
+            patterns.push(PICO_MATCH(l))
+        }
+
+        return patterns
+    } catch (e) {
+        return []
+    }
+}
+
 async function getSources(): Promise<string> {
-    let files = await getFileList(CWD)
+    let ignore = await getIgnore(PATH.join(CWD, '.annotateignore'))
+    console.log('ignoreing', ignore)
+    let files = await getFileList(CWD, ignore)
     let promises = files.map((f) => readSource(f))
     let code = await Promise.all(promises)
     let source = {}
@@ -68,11 +106,11 @@ async function getNotes(): Promise<string> {
 }
 
 STATIC_SERVER.addHandler('/notes.json', async () => {
-    return { contentString: await getNotes(), contentType: 'application/json' }
+    return {contentString: await getNotes(), contentType: 'application/json'}
 })
 
 STATIC_SERVER.addHandler('/source.json', async () => {
-    return { contentString: await getSources(), contentType: 'application/json' }
+    return {contentString: await getSources(), contentType: 'application/json'}
 })
 
 async function handleSaveNotes(data: Data, packet: CallPacket, response: IOResponse) {

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Annotate",
   "author": "Varuna Jayasiri",
+  "dependencies": {
+    "picomatch": "latest"
+  },
   "devDependencies": {
     "sass": "latest",
     "http-server": "latest",
